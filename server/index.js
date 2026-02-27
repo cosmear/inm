@@ -174,6 +174,25 @@ app.delete('/api/publications/:id', auth, async (req, res) => {
     }
 });
 
+// --- Configuración Full-Stack (Servir Frontend desde Node) ---
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Configuramos las variables de directorio de ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Apuntamos a la carpeta 'build' dentro de 'client'
+const clientBuildPath = path.join(__dirname, '../client/build');
+
+// Servimos los archivos estáticos de React
+app.use(express.static(clientBuildPath));
+
+// Cualquier otra ruta que no empiece con /api, devuelve el index.html del React (React Router)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
