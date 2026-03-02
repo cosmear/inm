@@ -1,51 +1,33 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/lib/db";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+export async function GET() {
+  try {
+    const [rows] = await pool.query("SELECT 1 AS ok");
 
-if (!JWT_SECRET) {
-    throw new Error("Falta la variable de entorno JWT_SECRET");
-}
+    return NextResponse.json({
+      success: true,
+      rows,
+    });
+  } catch (err) {
+    console.error("TEST DB ERROR:", {
+      message: err.message,
+      code: err.code,
+      errno: err.errno,
+      sqlState: err.sqlState,
+      sqlMessage: err.sqlMessage,
+    });
 
-export async function POST(request) {
-    try {
-        const body = await request.json();
-        const { username, password } = body;
-
-        const [rows] = await pool.query(
-            "SELECT * FROM admins WHERE username = ?",
-            [username]
-        );
-
-        const admin = rows[0];
-
-        if (!admin || !bcrypt.compareSync(password, admin.password)) {
-            return NextResponse.json(
-                { error: "Invalid credentials" },
-                { status: 400 }
-            );
-        }
-
-        const token = jwt.sign({ id: admin.id }, JWT_SECRET, { expiresIn: "1h" });
-
-        return NextResponse.json({ token });
-    } catch (err) {
-        console.error("LOGIN ERROR:", {
-            message: err.message,
-            code: err.code,
-            errno: err.errno,
-            sqlState: err.sqlState,
-            sqlMessage: err.sqlMessage,
-        });
-
-        return NextResponse.json(
-            {
-                error: "Database error",
-                detail: err.code || err.message,
-            },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json(
+      {
+        success: false,
+        error: err.message,
+        code: err.code,
+        errno: err.errno,
+        sqlState: err.sqlState,
+        sqlMessage: err.sqlMessage,
+      },
+      { status: 500 }
+    );
+  }
 }
