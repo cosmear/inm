@@ -1,31 +1,39 @@
 import { NextResponse } from "next/server";
-import { pool } from "@/lib/db";
+import mysql from "mysql2/promise";
 
 export async function GET() {
   try {
-    const [rows] = await pool.query("SELECT 1 AS ok");
+    const config = {
+      host: process.env.DB_HOST || "localhost",
+      port: Number(process.env.DB_PORT || 3306),
+      user: process.env.DB_USER || "",
+      password: process.env.DB_PASSWORD || "",
+      database: process.env.DB_NAME || "",
+    };
+
+    const connection = await mysql.createConnection(config);
+    const [rows] = await connection.query("SELECT 1 AS ok");
+    await connection.end();
 
     return NextResponse.json({
       success: true,
+      config: {
+        host: config.host,
+        port: config.port,
+        user: config.user,
+        database: config.database,
+      },
       rows,
     });
   } catch (err) {
-    console.error("TEST DB ERROR:", {
-      message: err.message,
-      code: err.code,
-      errno: err.errno,
-      sqlState: err.sqlState,
-      sqlMessage: err.sqlMessage,
-    });
-
     return NextResponse.json(
       {
         success: false,
-        error: err.message,
-        code: err.code,
-        errno: err.errno,
-        sqlState: err.sqlState,
-        sqlMessage: err.sqlMessage,
+        message: err.message,
+        code: err.code || null,
+        errno: err.errno || null,
+        sqlState: err.sqlState || null,
+        sqlMessage: err.sqlMessage || null,
       },
       { status: 500 }
     );
