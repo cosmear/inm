@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+    throw new Error("Falta la variable de entorno JWT_SECRET");
+}
 
 // Helper for Auth extraction
 function verifyToken(req) {
