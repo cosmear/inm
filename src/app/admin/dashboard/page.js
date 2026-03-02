@@ -38,24 +38,48 @@ const Dashboard = () => {
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+
+            console.log("TOKEN EN DASHBOARD:", token);
+
             const res = await fetch(`${apiUrl}/api/publications`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify(form)
             });
 
+            const result = await res.json().catch(() => null);
+            console.log("STATUS PUBLICATION:", res.status);
+            console.log("RESULT PUBLICATION:", result);
+
             if (res.ok) {
-                setForm({ title: '', description: '', price: '', image_url: '', location: '', type: 'Penthouse', operation: 'Comprar', bedrooms: 1, bathrooms: 1, area: 50, amenities: '' });
+                setForm({
+                    title: '',
+                    description: '',
+                    price: '',
+                    image_url: '',
+                    location: '',
+                    type: 'Penthouse',
+                    operation: 'Comprar',
+                    bedrooms: 1,
+                    bathrooms: 1,
+                    area: 50,
+                    amenities: ''
+                });
                 fetchPublications();
             } else {
                 alert('Error al agregar publicación.');
             }
         } catch (err) {
+            console.error("ERROR HANDLE SUBMIT:", err);
             alert('Error al agregar publicación. Verifica tu conexión.');
         } finally {
             setLoading(false);
