@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #556B2F;
-  --color-primary-dark: #3e4d22;
-  --color-cream: #F8F5E6;
+  --color-primary: #4A5D23; /* Slightly deeper, more elegant olive */
+  --color-primary-dark: #36451A;
+  --color-cream: #FCFAF5; /* Lighter cream, less yellow/heavy */
   --color-stone-dark: #2C331F;
   --color-stone-light: #8C9283;
   --color-taupe: #8B8680;
@@ -11,7 +11,7 @@
   --font-display: "Manrope", ui-sans-serif, system-ui;
   --font-serif: "Playfair Display", ui-serif, Georgia;
 
-  --shadow-glass: 0 8px 32px 0 rgba(44, 51, 31, 0.1);
+  --shadow-glass: 0 4px 40px -2px rgba(44, 51, 31, 0.06);
 }
 
 @layer base {
@@ -22,6 +22,6 @@
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
+    @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-glass;
   }
 }
