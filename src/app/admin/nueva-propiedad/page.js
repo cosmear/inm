@@ -49,8 +49,12 @@ export default function NuevaPropiedad() {
         bathrooms: 0,
         toilettes: 0,
         cocheras: 0,
+        age: 'Años de antigüedad',
+        age_years: 0,
         area_covered: '',
         area: '',
+        expenses: '',
+        credit_apt: false,
         image_url: '',
         video_url: '',
         plan_url: '',
@@ -99,7 +103,9 @@ export default function NuevaPropiedad() {
                     ...form,
                     area: Number(form.area) || 0,
                     area_covered: Number(form.area_covered) || 0,
-                    price: Number(form.price) || 0
+                    price: Number(form.price) || 0,
+                    expenses: Number(form.expenses) || 0,
+                    age: form.age === 'Años de antigüedad' ? form.age_years.toString() : form.age
                 })
             });
 
@@ -282,6 +288,42 @@ export default function NuevaPropiedad() {
                             {currentStep === 3 && (
                                 <div className="space-y-10 animate-fade-in">
 
+                                    <div className="pt-2">
+                                        <h3 className="font-serif text-xl text-stone-dark mb-6">Antigüedad</h3>
+                                        <div className="space-y-4 max-w-lg">
+                                            {[
+                                                { id: 'a_estrenar', label: 'A estrenar', value: 'A estrenar' },
+                                                { id: 'anos_antiguedad', label: 'Años de antigüedad', value: 'Años de antigüedad' },
+                                                { id: 'en_construccion', label: 'En construcción', value: 'En construcción' },
+                                            ].map((option) => (
+                                                <div key={option.id} className="flex items-center gap-4">
+                                                    <label className="flex items-center gap-3 cursor-pointer text-sm text-stone-dark group">
+                                                        <input
+                                                            type="radio"
+                                                            name="age"
+                                                            value={option.value}
+                                                            checked={form.age === option.value}
+                                                            onChange={handleChange}
+                                                            className="w-5 h-5 accent-[#F06C00] cursor-pointer"
+                                                        />
+                                                        {option.label}
+                                                    </label>
+                                                    {form.age === 'Años de antigüedad' && option.value === 'Años de antigüedad' && (
+                                                        <input
+                                                            type="number"
+                                                            name="age_years"
+                                                            value={form.age_years}
+                                                            onChange={handleChange}
+                                                            className="w-24 bg-white border border-stone-dark/20 rounded-xl px-4 py-2 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-stone-dark/10" />
+
                                     <div className="grid grid-cols-2 gap-y-8 gap-x-6 max-w-lg">
                                         {[
                                             { label: 'Ambientes (opcional)', field: 'ambientes' },
@@ -346,22 +388,58 @@ export default function NuevaPropiedad() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="md:col-span-2">
-                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Título de la publicación *</label>
-                                            <input type="text" name="title" value={form.title} onChange={handleChange} placeholder="Ej: Espectacular depto en Palermo" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" required />
+                                            <h3 className="font-serif text-xl text-stone-dark mb-6">Describí la propiedad</h3>
+                                            <p className="text-stone-dark/60 text-sm mb-6 -mt-4">Asegurate de incluir el tipo de propiedad y el tipo de operación de tu aviso.</p>
                                         </div>
                                         <div className="md:col-span-2">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Título *</label>
+                                            <div className="relative">
+                                                <input type="text" name="title" value={form.title} onChange={handleChange} placeholder="Completá el título de tu aviso" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required />
+                                            </div>
+                                            {!form.title && <p className="text-[#C10015] text-[10px] mt-1.5 ml-1">Agregá un título a tu aviso.</p>}
+                                        </div>
+                                        <div className="md:col-span-2 mb-4">
                                             <label className="text-xs font-medium text-stone-dark/60 block mb-2">Descripción *</label>
-                                            <textarea name="description" value={form.description} onChange={handleChange} placeholder="Detalla los puntos fuertes de la propiedad..." className="w-full min-h-[120px] bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" required></textarea>
+                                            <div className="relative">
+                                                <textarea name="description" value={form.description} onChange={handleChange} placeholder="Escribí un mínimo de 150 caracteres." className="w-full min-h-[140px] bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-y" required></textarea>
+                                                <span className="absolute bottom-3 right-4 text-xs font-medium text-stone-dark/40">{form.description.length}</span>
+                                            </div>
+                                            {form.description.length < 150 && <p className="text-[#C10015] text-[10px] mt-1.5 ml-1">Escribí un mínimo de 150 caracteres.</p>}
+                                        </div>
+
+                                        <div className="md:col-span-2 pt-6 border-t border-stone-dark/10">
+                                            <h3 className="font-serif text-xl text-stone-dark mb-6">Precio</h3>
                                         </div>
                                         <div>
-                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Precio sugerido (USD) *</label>
-                                            <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary transition-all">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Precio de la propiedad *</label>
+                                            <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
                                                 <span className="bg-stone-50 px-4 py-3 text-stone-dark/60 text-sm border-r border-stone-dark/20">US$</span>
-                                                <input type="number" name="price" value={form.price} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="Ej: 150000" required />
+                                                <input type="number" name="price" value={form.price} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="0" required />
+                                            </div>
+                                            {!form.price && <p className="text-[#C10015] text-[10px] mt-1.5 ml-1">Ingresá el precio de la propiedad.</p>}
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Expensas (opcional)</label>
+                                            <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+                                                <span className="bg-stone-50 px-4 py-3 text-stone-dark/60 text-sm border-r border-stone-dark/20">$</span>
+                                                <input type="number" name="expenses" value={form.expenses} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="0" />
                                             </div>
                                         </div>
-                                        <div>
-                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Amenities (Separados por coma)</label>
+                                        <div className="md:col-span-2 mt-2 border-b border-stone-dark/10 pb-6 mb-2">
+                                            <label className="flex items-center gap-3 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    name="credit_apt"
+                                                    checked={form.credit_apt}
+                                                    onChange={(e) => setForm({ ...form, credit_apt: e.target.checked })}
+                                                    className="w-5 h-5 accent-[#F06C00] cursor-pointer rounded border-stone-dark/20"
+                                                />
+                                                <span className="text-sm font-medium text-stone-dark">Apto crédito</span>
+                                            </label>
+                                        </div>
+
+                                        <div className="md:col-span-2 pt-2">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Amenities opcionales (Separados por coma)</label>
                                             <input type="text" name="amenities" value={form.amenities} onChange={handleChange} placeholder="Ej: Pileta, Gimnasio, Parrilla" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
                                         </div>
                                     </div>
