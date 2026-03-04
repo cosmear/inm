@@ -55,9 +55,9 @@ export default function NuevaPropiedad() {
         area: '',
         expenses: '',
         credit_apt: false,
-        image_url: '',
+        image_url: '', // This will hold the File object or local URL
         video_url: '',
-        plan_url: '',
+        plan_url: '', // This will hold the File object or local URL
         title: '',
         description: '',
         price: '',
@@ -88,10 +88,39 @@ export default function NuevaPropiedad() {
         if (currentStep > 1) setCurrentStep(currentStep - 1);
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setForm({ ...form, [e.target.name]: file });
+        }
+    };
+
+    const uploadFile = async (file) => {
+        if (!file || typeof file === 'string') return file; // Already a URL or empty
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const res = await fetch(`${apiUrl}/api/upload`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData
+        });
+
+        if (!res.ok) throw new Error('Error subiendo archivo');
+        const data = await res.json();
+        return data.url;
+    };
+
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         setLoading(true);
         try {
+            // Upload images first
+            const finalImageUrl = await uploadFile(form.image_url);
+            const finalPlanUrl = await uploadFile(form.plan_url);
+
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${apiUrl}/api/publications`, {
                 method: 'POST',
@@ -101,6 +130,8 @@ export default function NuevaPropiedad() {
                 },
                 body: JSON.stringify({
                     ...form,
+                    image_url: finalImageUrl || '',
+                    plan_url: finalPlanUrl || '',
                     area: Number(form.area) || 0,
                     area_covered: Number(form.area_covered) || 0,
                     price: Number(form.price) || 0,
@@ -117,7 +148,7 @@ export default function NuevaPropiedad() {
             }
         } catch (err) {
             console.error(err);
-            alert('Error al agregar publicación. Verifica tu conexión.');
+            alert('Error al agregar publicación o subir imágenes. Verifica tu conexión.');
         } finally {
             setLoading(false);
         }
@@ -370,8 +401,23 @@ export default function NuevaPropiedad() {
                                 <div className="space-y-6 animate-fade-in">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">URL Imagen Principal</label>
-                                            <input type="text" name="image_url" value={form.image_url} onChange={handleChange} placeholder="https://ejemplo.com/imagen.jpg" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Imagen Principal (Requerida) *</label>
+                                            <div className="flex flex-col gap-3">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    name="image_url"
+                                                    onChange={handleFileChange}
+                                                    className="block w-full text-sm text-stone-dark/70 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer bg-white border border-stone-dark/20 rounded-xl"
+                                                    required
+                                                />
+                                                {form.image_url && form.image_url instanceof File && (
+                                                    <div className="text-xs text-stone-dark/60 line-clamp-1">Seleccionado: {form.image_url.name}</div>
+                                                )}
+                                                {form.image_url && typeof form.image_url === 'string' && (
+                                                    <div className="text-xs text-stone-dark/60">Imagen ya cargada o desde URL.</div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="text-xs font-medium text-stone-dark/60 block mb-2">Video de YouTube (URL)</label>
@@ -380,8 +426,19 @@ export default function NuevaPropiedad() {
                                     </div>
 
                                     <div>
-                                        <label className="text-xs font-medium text-stone-dark/60 block mb-2">Plano de la propiedad (URL Imagen)</label>
-                                        <input type="text" name="plan_url" value={form.plan_url} onChange={handleChange} placeholder="Opcional: https://ejemplo.com/plano.jpg" className="w-full max-w-md bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                        <label className="text-xs font-medium text-stone-dark/60 block mb-2">Plano de la propiedad (Opcional)</label>
+                                        <div className="flex flex-col gap-3 max-w-md">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                name="plan_url"
+                                                onChange={handleFileChange}
+                                                className="block w-full text-sm text-stone-dark/70 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-dark hover:file:bg-stone-200 transition-colors cursor-pointer bg-white border border-stone-dark/20 rounded-xl"
+                                            />
+                                            {form.plan_url && form.plan_url instanceof File && (
+                                                <div className="text-xs text-stone-dark/60 line-clamp-1">Seleccionado: {form.plan_url.name}</div>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <hr className="my-6 border-stone-dark/10" />
