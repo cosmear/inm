@@ -77,8 +77,8 @@ export async function POST(request) {
     try {
         const data = await request.json();
         const [result] = await pool.query(
-            `INSERT INTO publications (title, description, price, image_url, location, type, operation, bedrooms, bathrooms, area, amenities, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [data.title, data.description, data.price, data.image_url, data.location, data.type, data.operation, data.bedrooms, data.bathrooms, data.area, data.amenities, data.featured ? 1 : 0]
+            `INSERT INTO publications (title, description, price, image_url, location, type, operation, bedrooms, bathrooms, area, amenities, featured, subtipo, provincia, ciudad, area_covered, ambientes, toilettes, cocheras, video_url, plan_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [data.title, data.description, data.price, data.image_url, data.location, data.type, data.operation, data.bedrooms, data.bathrooms, data.area, data.amenities, data.featured ? 1 : 0, data.subtipo, data.provincia, data.ciudad, data.area_covered, data.ambientes, data.toilettes, data.cocheras, data.video_url, data.plan_url]
         );
         return NextResponse.json({ id: result.insertId });
     } catch (err) {

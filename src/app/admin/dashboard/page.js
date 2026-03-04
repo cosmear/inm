@@ -7,13 +7,8 @@ import Link from 'next/link';
 
 const Dashboard = () => {
     const [publications, setPublications] = useState([]);
-    const [form, setForm] = useState({
-        title: '', description: '', price: '', image_url: '', location: '',
-        type: 'Penthouse', operation: 'Comprar', bedrooms: 1, bathrooms: 1, area: 50, amenities: ''
-    });
     const { token, logout } = useAuth();
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -36,55 +31,7 @@ const Dashboard = () => {
         if (token) fetchPublications();
     }, [token]);
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-
-            console.log("TOKEN EN DASHBOARD:", token);
-
-            const res = await fetch(`${apiUrl}/api/publications`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(form)
-            });
-
-            const result = await res.json().catch(() => null);
-            console.log("STATUS PUBLICATION:", res.status);
-            console.log("RESULT PUBLICATION:", result);
-
-            if (res.ok) {
-                setForm({
-                    title: '',
-                    description: '',
-                    price: '',
-                    image_url: '',
-                    location: '',
-                    type: 'Penthouse',
-                    operation: 'Comprar',
-                    bedrooms: 1,
-                    bathrooms: 1,
-                    area: 50,
-                    amenities: ''
-                });
-                fetchPublications();
-            } else {
-                alert('Error al agregar publicación.');
-            }
-        } catch (err) {
-            console.error("ERROR HANDLE SUBMIT:", err);
-            alert('Error al agregar publicación. Verifica tu conexión.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleDelete = async (id) => {
         if (!window.confirm('¿Seguro que quieres eliminar esta publicación de forma permanente?')) return;
@@ -106,29 +53,15 @@ const Dashboard = () => {
         <div className="bg-cream min-h-screen font-display flex flex-col">
             <main className="max-w-[1440px] mx-auto px-6 lg:px-12 py-32 w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <aside className="lg:col-span-12 xl:col-span-4">
-                    <div className="sticky top-32 glass-card p-8 rounded-2xl shadow-glass border border-white/60">
-                        <h2 className="font-serif text-3xl text-stone-dark mb-8">Nuevo Anuncio</h2>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-4">
-                                <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Título del Inmueble</label><input type="text" name="title" value={form.title} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Operación</label><select name="operation" value={form.operation} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all"><option value="Comprar">Venta</option><option value="Alquilar">Alquiler</option></select></div>
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Tipo</label><select name="type" value={form.type} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all"><option value="Penthouse">Penthouse</option><option value="Casco Histórico">Casco Histórico</option><option value="Villa Moderna">Villa Moderna</option><option value="Viñedo">Viñedo</option></select></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Precio (USD)</label><input type="number" name="price" value={form.price} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Sup. (m²)</label><input type="number" name="area" value={form.area} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Dormitorios</label><input type="number" name="bedrooms" value={form.bedrooms} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Baños</label><input type="number" name="bathrooms" value={form.bathrooms} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                </div>
-                                <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Ubicación</label><input type="text" name="location" value={form.location} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">URL Imagen</label><input type="text" name="image_url" value={form.image_url} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all" required /></div>
-                                <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Descripción Corta</label><textarea name="description" value={form.description} onChange={handleChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 focus:bg-white outline-none transition-all min-h-[100px]" required></textarea></div>
-                            </div>
-                            <button disabled={loading} className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg disabled:opacity-50 transition-all">{loading ? 'Publicando...' : 'Crear Publicación'}</button>
-                        </form>
+                    <div className="sticky top-32 glass-card p-10 rounded-3xl shadow-glass border border-white/60 text-center flex flex-col items-center justify-center min-h-[300px]">
+                        <div className="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-6">
+                            <span className="material-symbols-outlined text-3xl">add_home</span>
+                        </div>
+                        <h2 className="font-serif text-2xl text-stone-dark mb-3">¿Nueva propiedad?</h2>
+                        <p className="text-stone-dark/60 text-sm mb-8 px-4">Utiliza nuestro nuevo asistente paso a paso para publicarla fácilmente.</p>
+                        <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg transition-all text-center block">
+                            Crear Nueva Propiedad
+                        </Link>
                     </div>
                 </aside>
                 <div className="lg:col-span-12 xl:col-span-8 space-y-8">

@@ -1,0 +1,413 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/components/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+const steps = [
+    { id: 1, name: 'Principales' },
+    { id: 2, name: 'Ubicación' },
+    { id: 3, name: 'Características' },
+    { id: 4, name: 'Multimedia y Publicar' }
+];
+
+const propertyTypes = {
+    'Departamento': ['Apartaestudio', 'Dúplex', 'Estándar', 'Loft', 'Monoambiente', 'Penthouse', 'Piso', 'Triplex', 'Semipiso'],
+    'Casa': ['Chalet', 'Cabaña', 'Casa de campo', 'Dúplex', 'Triplex', 'Villa'],
+    'PH': [],
+    'Local comercial': [],
+    'Oficina comercial': [],
+    'Terrenos': [],
+    'Quinta Vacacional': [],
+    'Depósito': [],
+    'Edificio': [],
+    'Hotel': []
+};
+
+const provinces = [
+    'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes', 'Entre Ríos',
+    'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro',
+    'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego', 'Tucumán'
+];
+
+export default function NuevaPropiedad() {
+    const { token } = useAuth();
+    const router = useRouter();
+    const [currentStep, setCurrentStep] = useState(1);
+    const [loading, setLoading] = useState(false);
+
+    const [form, setForm] = useState({
+        operation: 'Venta',
+        type: '',
+        subtipo: '',
+        location: '',
+        provincia: '',
+        ciudad: '',
+        ambientes: 0,
+        bedrooms: 0,
+        bathrooms: 0,
+        toilettes: 0,
+        cocheras: 0,
+        area_covered: '',
+        area: '',
+        image_url: '',
+        video_url: '',
+        plan_url: '',
+        title: '',
+        description: '',
+        price: '',
+        amenities: ''
+    });
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (!token) router.replace('/admin/login');
+        }, 100);
+        return () => clearTimeout(timer);
+    }, [token, router]);
+
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+    const handleNumberChange = (field, delta) => {
+        setForm(prev => ({
+            ...prev,
+            [field]: Math.max(0, prev[field] + delta)
+        }));
+    };
+
+    const handleNext = () => {
+        if (currentStep < 4) setCurrentStep(currentStep + 1);
+    };
+
+    const handleBack = () => {
+        if (currentStep > 1) setCurrentStep(currentStep - 1);
+    };
+
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault();
+        setLoading(true);
+        try {
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+            const res = await fetch(`${apiUrl}/api/publications`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    ...form,
+                    area: Number(form.area) || 0,
+                    area_covered: Number(form.area_covered) || 0,
+                    price: Number(form.price) || 0
+                })
+            });
+
+            if (res.ok) {
+                alert('¡Publicación creada exitosamente!');
+                router.push('/admin/dashboard');
+            } else {
+                alert('Error al agregar publicación.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error al agregar publicación. Verifica tu conexión.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!token) return null;
+
+    return (
+        <div className="bg-cream min-h-screen font-display flex flex-col">
+            {/* Top Navigation */}
+            <div className="bg-white border-b border-stone-dark/10 sticky top-0 z-10 w-full pt-20">
+                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between relative">
+                    {/* Progress Bar */}
+                    <div className="absolute top-1/2 left-6 right-6 h-0.5 bg-stone-dark/10 -z-10 -translate-y-1/2 rounded-full"></div>
+                    <div
+                        className="absolute top-1/2 left-6 h-0.5 bg-primary -z-10 -translate-y-1/2 transition-all duration-300 rounded-full"
+                        style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                    ></div>
+
+                    {steps.map((step) => (
+                        <div key={step.id} className="flex flex-col items-center gap-2 bg-white px-2">
+                            <div className={`size-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${currentStep >= step.id ? 'bg-primary text-white' : 'bg-stone-dark/10 text-stone-dark/40'
+                                }`}>
+                                {currentStep > step.id ? '✓' : step.id}
+                            </div>
+                            <span className={`text-[10px] uppercase tracking-wider font-medium hidden md:block ${currentStep >= step.id ? 'text-primary' : 'text-stone-dark/40'
+                                }`}>{step.name}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <main className="flex-grow max-w-5xl mx-auto px-6 py-12 w-full flex flex-col md:flex-row gap-8 items-start">
+
+                {/* Sidebar Menu (Desktop) */}
+                <aside className="w-full md:w-64 shrink-0 bg-stone-50 rounded-2xl p-4 hidden md:block border border-stone-dark/5 shadow-sm sticky top-40">
+                    <ul className="space-y-2">
+                        <li className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer ${currentStep === 1 ? 'bg-white shadow-sm border-l-2 border-primary text-stone-dark' : 'text-stone-dark/60 hover:bg-stone-100'}`} onClick={() => setCurrentStep(1)}>
+                            Operación y tipo
+                        </li>
+                        <li className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer ${currentStep === 2 ? 'bg-white shadow-sm border-l-2 border-primary text-stone-dark' : 'text-stone-dark/60 hover:bg-stone-100'}`} onClick={() => setCurrentStep(1 < currentStep ? 2 : currentStep)}>
+                            Ubicación
+                        </li>
+                        <li className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer ${currentStep === 3 ? 'bg-white shadow-sm border-l-2 border-primary text-stone-dark' : 'text-stone-dark/60 hover:bg-stone-100'}`} onClick={() => setCurrentStep(2 < currentStep ? 3 : currentStep)}>
+                            Características
+                        </li>
+                        <li className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer ${currentStep === 4 ? 'bg-white shadow-sm border-l-2 border-primary text-stone-dark' : 'text-stone-dark/60 hover:bg-stone-100'}`} onClick={() => setCurrentStep(3 < currentStep ? 4 : currentStep)}>
+                            Multimedia
+                        </li>
+                    </ul>
+                </aside>
+
+                {/* Main Content Area */}
+                <div className="flex-grow w-full">
+                    <h1 className="text-2xl font-serif text-stone-dark mb-8">
+                        {currentStep === 1 && '¡Hola, empecemos a crear tu aviso!'}
+                        {currentStep === 2 && '¿Dónde está ubicada tu propiedad?'}
+                        {currentStep === 3 && 'Características principales'}
+                        {currentStep === 4 && 'Detalles y Multimedia'}
+                    </h1>
+
+                    <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-stone-dark/5 min-h-[400px] flex flex-col justify-between">
+
+                        <div className="space-y-8 flex-grow">
+                            {/* Step 1: Operación y Tipo */}
+                            {currentStep === 1 && (
+                                <div className="space-y-8 animate-fade-in">
+                                    <h2 className="text-lg font-medium text-stone-dark mb-4">Contanos, ¿qué querés publicar?</h2>
+
+                                    <div>
+                                        <label className="text-xs font-medium text-stone-dark/60 block mb-3">Tipo de operación</label>
+                                        <div className="flex flex-wrap gap-0 border border-stone-dark/20 rounded-xl overflow-hidden w-fit">
+                                            {['Venta', 'Alquiler', 'Temporada'].map(op => (
+                                                <button
+                                                    key={op}
+                                                    type="button"
+                                                    onClick={() => setForm({ ...form, operation: op })}
+                                                    className={`px-6 py-2.5 text-sm font-medium border-r border-stone-dark/20 last:border-r-0 transition-colors ${form.operation === op ? 'text-primary bg-primary/5' : 'text-stone-dark/70 hover:bg-stone-50'}`}
+                                                >
+                                                    {op}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="flex-1">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Tipo de propiedad</label>
+                                            <select
+                                                name="type"
+                                                value={form.type}
+                                                onChange={(e) => {
+                                                    setForm({ ...form, type: e.target.value, subtipo: '' })
+                                                }}
+                                                className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                            >
+                                                <option value="">Seleccioná el tipo de propiedad</option>
+                                                {Object.keys(propertyTypes).map(t => (
+                                                    <option key={t} value={t}>{t}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Subtipo de propiedad</label>
+                                            <select
+                                                name="subtipo"
+                                                value={form.subtipo}
+                                                onChange={handleChange}
+                                                disabled={!form.type || propertyTypes[form.type]?.length === 0}
+                                                className="w-full bg-white border border-stone-dark/20 disabled:bg-stone-100 disabled:opacity-60 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                            >
+                                                <option value="">Seleccioná el subtipo</option>
+                                                {(propertyTypes[form.type] || []).map(st => (
+                                                    <option key={st} value={st}>{st}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Step 2: Ubicación */}
+                            {currentStep === 2 && (
+                                <div className="space-y-8 animate-fade-in">
+                                    <div>
+                                        <label className="text-xs font-medium text-stone-dark/60 block mb-2">Ingresá calle y altura</label>
+                                        <input
+                                            type="text"
+                                            name="location"
+                                            value={form.location}
+                                            onChange={handleChange}
+                                            placeholder="Ingresá una dirección"
+                                            className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="flex-1">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Provincia</label>
+                                            <select
+                                                name="provincia"
+                                                value={form.provincia}
+                                                onChange={handleChange}
+                                                className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                            >
+                                                <option value="">Seleccioná una provincia</option>
+                                                {provinces.map(p => (
+                                                    <option key={p} value={p}>{p}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Ciudad</label>
+                                            <input
+                                                type="text"
+                                                name="ciudad"
+                                                value={form.ciudad}
+                                                onChange={handleChange}
+                                                placeholder="Ingresá la ciudad o barrio"
+                                                className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Step 3: Características */}
+                            {currentStep === 3 && (
+                                <div className="space-y-10 animate-fade-in">
+
+                                    <div className="grid grid-cols-2 gap-y-8 gap-x-6 max-w-lg">
+                                        {[
+                                            { label: 'Ambientes (opcional)', field: 'ambientes' },
+                                            { label: 'Dormitorios (opcional)', field: 'bedrooms' },
+                                            { label: 'Baños (opcional)', field: 'bathrooms' },
+                                            { label: 'Toilettes (opcional)', field: 'toilettes' },
+                                            { label: 'Cocheras (opcional)', field: 'cocheras' },
+                                        ].map(item => (
+                                            <div key={item.field}>
+                                                <label className="text-xs font-medium text-stone-dark/60 block mb-3">{item.label}</label>
+                                                <div className="flex items-center gap-3">
+                                                    <button type="button" onClick={() => handleNumberChange(item.field, -1)} className="size-8 rounded flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-dark transition-colors">-</button>
+                                                    <span className="w-8 text-center text-sm font-medium">{form[item.field]}</span>
+                                                    <button type="button" onClick={() => handleNumberChange(item.field, 1)} className="size-8 rounded flex items-center justify-center bg-stone-100 hover:bg-stone-200 text-stone-dark transition-colors">+</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="pt-6 border-t border-stone-dark/10">
+                                        <h3 className="font-serif text-xl text-stone-dark mb-6">Superficie</h3>
+                                        <div className="flex flex-col md:flex-row gap-6 max-w-lg">
+                                            <div className="flex-1">
+                                                <label className="text-xs font-medium text-stone-dark/60 block mb-2">Superficie cubierta</label>
+                                                <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+                                                    <span className="bg-stone-50 px-4 py-3 text-stone-dark/60 text-sm border-r border-stone-dark/20">m2</span>
+                                                    <input type="number" name="area_covered" value={form.area_covered} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="0" />
+                                                </div>
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="text-xs font-medium text-stone-dark/60 block mb-2">Superficie total</label>
+                                                <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+                                                    <span className="bg-stone-50 px-4 py-3 text-stone-dark/60 text-sm border-r border-stone-dark/20">m2</span>
+                                                    <input type="number" name="area" value={form.area} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="0" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Step 4: Multimedia y Publicar */}
+                            {currentStep === 4 && (
+                                <div className="space-y-6 animate-fade-in">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">URL Imagen Principal</label>
+                                            <input type="text" name="image_url" value={form.image_url} onChange={handleChange} placeholder="https://ejemplo.com/imagen.jpg" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Video de YouTube (URL)</label>
+                                            <input type="text" name="video_url" value={form.video_url} onChange={handleChange} placeholder="Opcional: https://youtube.com/..." className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs font-medium text-stone-dark/60 block mb-2">Plano de la propiedad (URL Imagen)</label>
+                                        <input type="text" name="plan_url" value={form.plan_url} onChange={handleChange} placeholder="Opcional: https://ejemplo.com/plano.jpg" className="w-full max-w-md bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                    </div>
+
+                                    <hr className="my-6 border-stone-dark/10" />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="md:col-span-2">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Título de la publicación *</label>
+                                            <input type="text" name="title" value={form.title} onChange={handleChange} placeholder="Ej: Espectacular depto en Palermo" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" required />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Descripción *</label>
+                                            <textarea name="description" value={form.description} onChange={handleChange} placeholder="Detalla los puntos fuertes de la propiedad..." className="w-full min-h-[120px] bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" required></textarea>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Precio sugerido (USD) *</label>
+                                            <div className="flex bg-white border border-stone-dark/20 rounded-xl overflow-hidden focus-within:border-primary transition-all">
+                                                <span className="bg-stone-50 px-4 py-3 text-stone-dark/60 text-sm border-r border-stone-dark/20">US$</span>
+                                                <input type="number" name="price" value={form.price} onChange={handleChange} className="w-full px-4 py-3 text-sm outline-none bg-transparent" placeholder="Ej: 150000" required />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Amenities (Separados por coma)</label>
+                                            <input type="text" name="amenities" value={form.amenities} onChange={handleChange} placeholder="Ej: Pileta, Gimnasio, Parrilla" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Bottom Action Bar */}
+                        <div className="mt-10 pt-6 border-t border-stone-dark/10 flex items-center justify-between">
+                            {currentStep > 1 ? (
+                                <button type="button" onClick={handleBack} className="text-sm font-medium text-stone-dark/70 hover:text-primary transition-colors flex items-center gap-1">
+                                    <span className="material-symbols-outlined text-lg">chevron_left</span>
+                                    Atrás
+                                </button>
+                            ) : <div></div>}
+
+                            <div className="flex items-center gap-4">
+                                <Link href="/admin/dashboard" className="px-6 py-2.5 rounded-xl border border-stone-dark/20 text-stone-dark text-sm font-medium hover:bg-stone-50 transition-colors">
+                                    Guardar y salir
+                                </Link>
+
+                                {currentStep < 4 ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleNext}
+                                        disabled={currentStep === 1 && !form.type}
+                                        className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm transition-colors"
+                                    >
+                                        Continuar
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={handleSubmit}
+                                        disabled={loading || !form.title || !form.price || !form.description || !form.image_url}
+                                        className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm transition-colors flex items-center gap-2"
+                                    >
+                                        {loading ? 'Publicando...' : 'Publicar Aviso'}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+}
