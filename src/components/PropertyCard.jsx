@@ -28,7 +28,7 @@ const PropertyCard = ({ prop }) => {
 
                 <p className="text-stone-dark/60 font-medium text-xs flex items-center gap-1.5 mb-5 tracking-wide">
                     <span className="material-symbols-outlined text-[14px] text-primary/70">location_on</span>
-                    {prop.location}
+                    {prop.ciudad && prop.provincia ? `${prop.ciudad}, ${prop.provincia}` : prop.location}
                 </p>
 
                 <div className="flex items-center gap-4 pt-4 border-t border-stone-dark/10 mt-auto">
@@ -37,18 +37,34 @@ const PropertyCard = ({ prop }) => {
                         <span className="font-serif text-lg md:text-xl text-stone-dark">${prop.price?.toLocaleString()}</span>
                     </div>
 
-                    <div className="flex items-center gap-3 md:gap-4 ml-auto text-stone-dark/70">
-                        <div className="flex flex-col items-center">
-                            <span className="material-symbols-outlined text-[18px] text-primary/80">bed</span>
-                            <span className="text-[10px] font-medium tracking-tight mt-0.5">{prop.bedrooms}</span>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <span className="material-symbols-outlined text-[18px] text-primary/80">shower</span>
-                            <span className="text-[10px] font-medium tracking-tight mt-0.5">{prop.bathrooms}</span>
-                        </div>
-                        <div className="flex flex-col items-center border-l border-stone-dark/10 pl-3 md:pl-4">
-                            <span className="material-symbols-outlined text-[18px] text-primary/80">square_foot</span>
-                            <span className="text-[10px] font-medium tracking-tight mt-0.5">{prop.area}m²</span>
+                    <div className="flex items-center gap-2 md:gap-3 ml-auto text-stone-dark/70 flex-wrap justify-end">
+                        {prop.ambientes > 0 && (
+                            <div className="flex flex-col items-center">
+                                <span className="material-symbols-outlined text-[16px] text-primary/80">meeting_room</span>
+                                <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.ambientes} amb</span>
+                            </div>
+                        )}
+                        {prop.bedrooms > 0 && (
+                            <div className="flex flex-col items-center">
+                                <span className="material-symbols-outlined text-[16px] text-primary/80">bed</span>
+                                <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.bedrooms} dor</span>
+                            </div>
+                        )}
+                        {prop.bathrooms > 0 && (
+                            <div className="flex flex-col items-center">
+                                <span className="material-symbols-outlined text-[16px] text-primary/80">shower</span>
+                                <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.bathrooms} bñ</span>
+                            </div>
+                        )}
+                        {prop.cocheras > 0 && (
+                            <div className="flex flex-col items-center">
+                                <span className="material-symbols-outlined text-[16px] text-primary/80">directions_car</span>
+                                <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.cocheras} coch</span>
+                            </div>
+                        )}
+                        <div className="flex flex-col items-center border-l border-stone-dark/10 pl-2 md:pl-3">
+                            <span className="material-symbols-outlined text-[16px] text-primary/80">square_foot</span>
+                            <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.area}m²</span>
                         </div>
                     </div>
                 </div>

@@ -55,10 +55,16 @@ export async function GET(request) {
 
         const operation = searchParams.get('operation');
         const type = searchParams.get('type');
+        const subtipo = searchParams.get('subtipo');
         const minPrice = searchParams.get('minPrice');
         const maxPrice = searchParams.get('maxPrice');
         const location = searchParams.get('location');
+        const provincia = searchParams.get('provincia');
+        const ciudad = searchParams.get('ciudad');
         const bedrooms = searchParams.get('bedrooms');
+        const ambientes = searchParams.get('ambientes');
+        const cocheras = searchParams.get('cocheras');
+        const toilettes = searchParams.get('toilettes');
 
         if (operation) {
             query += " AND operation = ?";
@@ -67,6 +73,10 @@ export async function GET(request) {
         if (type) {
             query += " AND type = ?";
             params.push(type);
+        }
+        if (subtipo) {
+            query += " AND subtipo = ?";
+            params.push(subtipo);
         }
         if (minPrice) {
             query += " AND price >= ?";
@@ -80,9 +90,29 @@ export async function GET(request) {
             query += " AND location LIKE ?";
             params.push(`%${location}%`);
         }
+        if (provincia) {
+            query += " AND provincia = ?";
+            params.push(provincia);
+        }
+        if (ciudad) {
+            query += " AND ciudad LIKE ?";
+            params.push(`%${ciudad}%`);
+        }
         if (bedrooms) {
             query += " AND bedrooms >= ?";
             params.push(parseInt(bedrooms));
+        }
+        if (ambientes) {
+            query += " AND ambientes >= ?";
+            params.push(parseInt(ambientes));
+        }
+        if (cocheras) {
+            query += " AND cocheras >= ?";
+            params.push(parseInt(cocheras));
+        }
+        if (toilettes) {
+            query += " AND toilettes >= ?";
+            params.push(parseInt(toilettes));
         }
 
         query += " ORDER BY created_at DESC";

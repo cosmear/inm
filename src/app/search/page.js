@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import PropertyCard from '@/components/PropertyCard';
+import { provinces, propertyTypes } from '@/lib/constants';
 
 const SearchContent = () => {
     const searchParams = useSearchParams();
@@ -12,7 +13,10 @@ const SearchContent = () => {
     const [filters, setFilters] = useState({
         operation: searchParams.get('operation') || '',
         type: searchParams.get('type') || '',
-        location: searchParams.get('location') || '',
+        subtipo: searchParams.get('subtipo') || '',
+        provincia: searchParams.get('provincia') || '',
+        ciudad: searchParams.get('ciudad') || '',
+        location: searchParams.get('location') || '', // For backward compatibility
         maxPrice: '10000000',
         bedrooms: 0
     });
@@ -23,6 +27,9 @@ const SearchContent = () => {
             const params = new URLSearchParams();
             if (filters.operation) params.append('operation', filters.operation);
             if (filters.type) params.append('type', filters.type);
+            if (filters.subtipo) params.append('subtipo', filters.subtipo);
+            if (filters.provincia) params.append('provincia', filters.provincia);
+            if (filters.ciudad) params.append('ciudad', filters.ciudad);
             if (filters.location) params.append('location', filters.location);
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
             if (filters.bedrooms > 0) params.append('bedrooms', filters.bedrooms);
@@ -52,13 +59,39 @@ const SearchContent = () => {
                             <div>
                                 <h3 className="font-serif text-xl sm:text-2xl text-stone-dark mb-6">Refinar Búsqueda</h3>
                                 <div className="space-y-6">
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Operación</label><select name="operation" value={filters.operation} onChange={handleFilterChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all"><option value="">Todas</option><option value="Comprar">Venta</option><option value="Alquilar">Alquiler</option></select></div>
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Tipo</label><select name="type" value={filters.type} onChange={handleFilterChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all"><option value="">Cualquiera</option><option value="Penthouse">Penthouse</option><option value="Casco Histórico">Casco Histórico</option><option value="Villa Moderna">Villa Moderna</option><option value="Viñedo">Viñedo</option></select></div>
+                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Operación</label><select name="operation" value={filters.operation} onChange={handleFilterChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all"><option value="">Todas</option><option value="Venta">Venta</option><option value="Alquiler">Alquiler</option><option value="Temporada">Temporada</option></select></div>
+                                    <div>
+                                        <label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Provincia</label>
+                                        <select name="provincia" value={filters.provincia} onChange={handleFilterChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all">
+                                            <option value="">Todas</option>
+                                            {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Ciudad/Barrio</label>
+                                        <input type="text" name="ciudad" value={filters.ciudad} onChange={handleFilterChange} placeholder="Ej: Palermo" className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Tipo</label>
+                                        <select name="type" value={filters.type} onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value, subtipo: '' }))} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all">
+                                            <option value="">Cualquiera</option>
+                                            {Object.keys(propertyTypes).map(t => <option key={t} value={t}>{t}</option>)}
+                                        </select>
+                                    </div>
+                                    {filters.type && propertyTypes[filters.type]?.length > 0 && (
+                                        <div>
+                                            <label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Subtipo</label>
+                                            <select name="subtipo" value={filters.subtipo} onChange={handleFilterChange} className="w-full bg-white/50 border border-stone-dark/10 rounded-xl px-4 py-3 text-sm focus:border-primary/30 outline-none transition-all">
+                                                <option value="">Cualquiera</option>
+                                                {propertyTypes[filters.type].map(st => <option key={st} value={st}>{st}</option>)}
+                                            </select>
+                                        </div>
+                                    )}
                                     <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Precio Máximo: ${parseInt(filters.maxPrice).toLocaleString()}</label><input type="range" name="maxPrice" min="0" max="10000000" step="100000" value={filters.maxPrice} onChange={handleFilterChange} className="w-full h-1 bg-stone-dark/10 rounded-lg appearance-none cursor-pointer accent-primary" /></div>
                                     <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Dormitorios (Mínimo)</label><div className="flex gap-2">{[1, 2, 3, 4].map(num => (<button key={num} onClick={() => setFilters(f => ({ ...f, bedrooms: num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.bedrooms === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-white/50'}`}>{num}+</button>))}</div></div>
                                 </div>
                             </div>
-                            <button onClick={() => setFilters({ operation: '', type: '', location: '', maxPrice: '10000000', bedrooms: 0 })} className="w-full py-4 text-[10px] font-medium uppercase tracking-wider text-stone-dark/50 hover:text-primary transition-colors border-t border-stone-dark/10">Limpiar Filtros</button>
+                            <button onClick={() => setFilters({ operation: '', type: '', subtipo: '', provincia: '', ciudad: '', location: '', maxPrice: '10000000', bedrooms: 0 })} className="w-full py-4 text-[10px] font-medium uppercase tracking-wider text-stone-dark/50 hover:text-primary transition-colors border-t border-stone-dark/10">Limpiar Filtros</button>
                         </div>
                     </aside>
                     <div className="w-full lg:w-3/4">
