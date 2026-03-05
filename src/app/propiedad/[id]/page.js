@@ -27,21 +27,12 @@ export default async function PropertyDetails({ params }) {
         title, description, price, type, subtipo, operation, location,
         provincia, ciudad, image_url, plan_url, video_url,
         bedrooms, bathrooms, ambientes, cocheras, toilettes,
-        total_sqm, covered_sqm, antiquity, amenities,
-        is_credit_apt, expenses
+        area, area_covered, age, amenities,
+        credit_apt, expenses
     } = prop;
 
-    let parsedAmenities = [];
-    if (Array.isArray(amenities)) {
-        parsedAmenities = amenities;
-    } else if (typeof amenities === 'string' && amenities.trim()) {
-        try {
-            const parsed = JSON.parse(amenities);
-            parsedAmenities = Array.isArray(parsed) ? parsed : [parsed];
-        } catch (e) {
-            parsedAmenities = amenities.split(',').map(s => s.trim()).filter(Boolean);
-        }
-    }
+    const parsedAmenities = Array.isArray(amenities) ? amenities :
+        (typeof amenities === 'string' && amenities.trim() ? JSON.parse(amenities) : []);
 
     const displayLocation = (ciudad && provincia) ? `${ciudad}, ${provincia}` : location;
 
@@ -106,12 +97,12 @@ export default async function PropertyDetails({ params }) {
 
                         {/* Quick Stats Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white rounded-2xl border border-stone-dark/5 shadow-sm">
-                            {(covered_sqm > 0 || total_sqm > 0) && (
+                            {(area_covered > 0 || area > 0) && (
                                 <div className="flex flex-col gap-1">
                                     <span className="text-stone-dark/50 text-[10px] uppercase tracking-wider font-bold">Superficie Cub.</span>
                                     <div className="flex items-center gap-2 text-stone-dark font-serif text-xl">
                                         <span className="material-symbols-outlined text-primary/70">straighten</span>
-                                        {covered_sqm || total_sqm} m²
+                                        {area_covered || area} m²
                                     </div>
                                 </div>
                             )}
@@ -165,11 +156,11 @@ export default async function PropertyDetails({ params }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-dark/5">
                                     <div className="flex justify-between items-center p-4 hover:bg-stone-dark/5 transition-colors">
                                         <span className="text-sm text-stone-dark/60 font-medium">Superficie Total</span>
-                                        <span className="font-bold text-stone-dark">{total_sqm ? `${total_sqm} m²` : '-'}</span>
+                                        <span className="font-bold text-stone-dark">{area > 0 ? `${area} m²` : '-'}</span>
                                     </div>
                                     <div className="flex justify-between items-center p-4 hover:bg-stone-dark/5 transition-colors">
                                         <span className="text-sm text-stone-dark/60 font-medium">Superficie Cubierta</span>
-                                        <span className="font-bold text-stone-dark">{covered_sqm ? `${covered_sqm} m²` : '-'}</span>
+                                        <span className="font-bold text-stone-dark">{area_covered > 0 ? `${area_covered} m²` : '-'}</span>
                                     </div>
                                     <div className="flex justify-between items-center p-4 hover:bg-stone-dark/5 transition-colors border-t border-stone-dark/5">
                                         <span className="text-sm text-stone-dark/60 font-medium">Cocheras</span>
@@ -181,11 +172,11 @@ export default async function PropertyDetails({ params }) {
                                     </div>
                                     <div className="flex justify-between items-center p-4 hover:bg-stone-dark/5 transition-colors border-t border-stone-dark/5">
                                         <span className="text-sm text-stone-dark/60 font-medium">Antigüedad</span>
-                                        <span className="font-bold text-stone-dark">{antiquity ? `${antiquity} años` : 'A estrenar'}</span>
+                                        <span className="font-bold text-stone-dark">{age && age !== 'A estrenar' && age !== 'En construcción' ? `${age} años` : (age || 'A estrenar')}</span>
                                     </div>
                                     <div className="flex justify-between items-center p-4 hover:bg-stone-dark/5 transition-colors border-t border-stone-dark/5">
                                         <span className="text-sm text-stone-dark/60 font-medium">Apto Crédito</span>
-                                        <span className="font-bold text-stone-dark">{is_credit_apt === 1 ? 'Sí' : 'No'}</span>
+                                        <span className="font-bold text-stone-dark">{credit_apt === 1 ? 'Sí' : 'No'}</span>
                                     </div>
                                 </div>
                             </div>

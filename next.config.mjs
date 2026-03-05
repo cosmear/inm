@@ -1,13 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/uploads/:path*',
-        destination: '/api/uploads/:path*',
-      },
-    ]
-  },
+  /* config options here */
 };
 
 export default nextConfig;

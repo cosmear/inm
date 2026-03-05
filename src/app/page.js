@@ -11,11 +11,7 @@ export default async function Home() {
         const res = await fetch(`${apiUrl}/api/publications`, { cache: 'no-store' });
         if (res.ok) {
             const data = await res.json();
-            if (Array.isArray(data)) {
-                publications = data.slice(0, 3);
-            } else {
-                console.error("API did not return an array:", data);
-            }
+            publications = data.slice(0, 3);
         }
     } catch (err) {
         console.error('Error fetching featured publications:', err);

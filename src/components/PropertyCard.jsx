@@ -64,10 +64,16 @@ const PropertyCard = ({ prop }) => {
                                     <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.cocheras} coch</span>
                                 </div>
                             )}
-                            <div className="flex flex-col items-center border-l border-stone-dark/10 pl-2 md:pl-3">
-                                <span className="material-symbols-outlined text-[16px] text-primary/80">square_foot</span>
-                                <span className="text-[9px] font-medium tracking-tight mt-0.5">{prop.area}m²</span>
-                            </div>
+                            {(prop.area > 0 || prop.area_covered > 0) && (
+                                <div className="flex flex-col items-center border-l border-stone-dark/10 pl-2 md:pl-3">
+                                    <span className="material-symbols-outlined text-[16px] text-primary/80">square_foot</span>
+                                    <span className="text-[9px] font-medium tracking-tight mt-0.5">
+                                        {prop.area_covered > 0 && prop.area > 0 && prop.area_covered !== prop.area
+                                            ? `${prop.area_covered}/${prop.area} `
+                                            : `${prop.area_covered || prop.area} `}m²
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
