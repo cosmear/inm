@@ -95,7 +95,11 @@ export default function NuevaPropiedad() {
             body: formData
         });
 
-        if (!res.ok) throw new Error('Error subiendo archivo');
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            console.error("Upload Error:", errData);
+            throw new Error(`Error subiendo archivo: ${errData.details || res.statusText}`);
+        }
         const data = await res.json();
         return data.url;
     };

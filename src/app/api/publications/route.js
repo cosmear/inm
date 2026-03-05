@@ -34,15 +34,14 @@ function verifyToken(req) {
     }
 
     if (!token) {
-        console.error("verifyToken: Missing token in headers and query");
-        return null;
+        return { error: "Missing token in headers and query" };
     }
 
     try {
-        return jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, JWT_SECRET);
+        return { decoded };
     } catch (err) {
-        console.error("verifyToken: JWT Verification failed:", err.message);
-        return null;
+        return { error: `JWT Verification failed: ${err.message}. Token length: ${token.length}. Secret present: ${!!JWT_SECRET}` };
     }
 }
 
@@ -125,10 +124,11 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-    const admin = verifyToken(request);
-    if (!admin) {
-        return NextResponse.json({ error: 'Access denied.' }, { status: 401 });
+    const authResult = verifyToken(request);
+    if (authResult.error) {
+        return NextResponse.json({ error: 'Access denied.', details: authResult.error }, { status: 401 });
     }
+    const admin = authResult.decoded;
 
     try {
         const data = await request.json();
