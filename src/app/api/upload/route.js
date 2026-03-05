@@ -7,12 +7,38 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Helper to verify admin token before allowing uploads
 function verifyToken(req) {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) return null;
-    const token = authHeader.replace('Bearer ', '');
+    let token = null;
+
+    // Try standard Authorization header
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+    }
+
+    // Try custom header (less likely to be stripped by shared hosting)
+    if (!token) {
+        token = req.headers.get('x-access-token');
+    }
+
+    // Try URL query parameter
+    if (!token) {
+        try {
+            const url = new URL(req.url);
+            token = url.searchParams.get('token');
+        } catch (e) {
+            // Ignore URL parsing errors
+        }
+    }
+
+    if (!token) {
+        console.error("verifyToken: Missing token in headers and query");
+        return null;
+    }
+
     try {
         return jwt.verify(token, JWT_SECRET);
     } catch (err) {
+        console.error("verifyToken: JWT Verification failed:", err.message);
         return null;
     }
 }
@@ -20,6 +46,7 @@ function verifyToken(req) {
 export async function POST(request) {
     const admin = verifyToken(request);
     if (!admin) {
+        console.error("POST /api/upload: Access denied. verifyToken returned null.");
         return NextResponse.json({ error: 'Access denied.' }, { status: 401 });
     }
 

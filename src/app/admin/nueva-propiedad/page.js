@@ -102,9 +102,12 @@ export default function NuevaPropiedad() {
         formData.append('file', file);
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-        const res = await fetch(`${apiUrl}/api/upload`, {
+        const res = await fetch(`${apiUrl}/api/upload?token=${token}`, {
             method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'x-access-token': token
+            },
             body: formData
         });
 
@@ -122,11 +125,12 @@ export default function NuevaPropiedad() {
             const finalPlanUrl = await uploadFile(form.plan_url);
 
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${apiUrl}/api/publications`, {
+            const res = await fetch(`${apiUrl}/api/publications?token=${token}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
+                    'x-access-token': token
                 },
                 body: JSON.stringify({
                     ...form,
