@@ -15,6 +15,23 @@ function verifyToken(req) {
     }
 }
 
+export async function GET(request, { params }) {
+    try {
+        const id = (await params).id;
+        if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+
+        const [rows] = await pool.query(`SELECT * FROM publications WHERE id = ?`, [id]);
+
+        if (rows.length === 0) {
+            return NextResponse.json({ error: 'Property not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(rows[0]);
+    } catch (err) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
 export async function DELETE(request, { params }) {
     const admin = verifyToken(request);
     if (!admin) {
