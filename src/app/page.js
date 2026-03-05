@@ -40,11 +40,11 @@ export default async function Home() {
                         {/* Search Bar */}
                         <div className="bg-white/20 backdrop-blur-2xl p-2 rounded-2xl border border-white/30 shadow-2xl max-w-3xl mx-auto transform hover:scale-[1.02] transition-transform duration-500">
                             <div className="bg-white rounded-xl flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-stone-dark/10 overflow-hidden">
-                                <Link href="/search?operation=Comprar" className="flex-1 px-8 py-4 hover:bg-primary/5 transition-colors text-left group">
+                                <Link href="/search?operation=Venta" className="flex-1 px-8 py-4 hover:bg-primary/5 transition-colors text-left group">
                                     <span className="text-[9px] font-semibold uppercase tracking-widest text-primary/80 block mb-1 group-hover:translate-x-1 transition-transform">Venta</span>
                                     <span className="text-stone-dark font-serif text-lg md:text-xl">Propiedades Exclusivas</span>
                                 </Link>
-                                <Link href="/search?operation=Alquilar" className="flex-1 px-8 py-4 hover:bg-primary/5 transition-colors text-left group">
+                                <Link href="/search?operation=Alquiler" className="flex-1 px-8 py-4 hover:bg-primary/5 transition-colors text-left group">
                                     <span className="text-[9px] font-semibold uppercase tracking-widest text-primary/80 block mb-1 group-hover:translate-x-1 transition-transform">Alquiler</span>
                                     <span className="text-stone-dark font-serif text-lg md:text-xl">Residencias de Temporada</span>
                                 </Link>
