@@ -51,7 +51,7 @@ export default async function PropertyDetails({ params }) {
                             <div className="flex flex-wrap items-center gap-2 mb-3">
                                 <span className="bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">{operation}</span>
                                 <span className="bg-stone-dark/5 text-stone-dark/70 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">{subtipo || type}</span>
-                                {is_credit_apt === 1 && <span className="bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Apto Crédito</span>}
+                                {credit_apt === 1 && <span className="bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Apto Crédito</span>}
                             </div>
                             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-dark mb-2 leading-tight">{title}</h1>
                             <div className="flex items-center gap-2 text-stone-dark/70 font-medium">
