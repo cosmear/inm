@@ -64,9 +64,19 @@ export async function POST(request) {
         const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extension}`;
         const relativeUrl = `/uploads/${filename}`;
 
+        const { writeFile, mkdir } = require('fs/promises');
+
         // Save to public/uploads
-        // In Next.js App Router, process.cwd() is the root of the project
         const destinationDirPath = path.join(process.cwd(), 'public', 'uploads');
+
+        // Ensure directory exists! This is a common issue on shared hosting
+        try {
+            await mkdir(destinationDirPath, { recursive: true });
+        } catch (dirErr) {
+            console.error("Error creating directory:", dirErr);
+            // Ignore if it already exists
+        }
+
         const filePath = path.join(destinationDirPath, filename);
 
         await writeFile(filePath, buffer);
@@ -74,6 +84,6 @@ export async function POST(request) {
         return NextResponse.json({ url: relativeUrl, success: true });
     } catch (error) {
         console.error("Error uploading file:", error);
-        return NextResponse.json({ error: 'Upload failed.' }, { status: 500 });
+        return NextResponse.json({ error: 'Upload failed.', details: error.message, stack: error.stack }, { status: 500 });
     }
 }
