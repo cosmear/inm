@@ -62,7 +62,7 @@ export async function POST(request) {
         // Ensure a safe, unique filename
         const extension = path.extname(file.name) || '.jpg';
         const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extension}`;
-        const relativeUrl = `/uploads/${filename}`;
+        const relativeUrl = `/api/uploads/${filename}`;
 
         const { writeFile, mkdir } = require('fs/promises');
 
