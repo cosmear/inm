@@ -80,56 +80,34 @@ export default async function PropertyDetails({ params }) {
                     </div>
                 </div>
 
+// (Added at the top of the file)
+                import PropertyGallery from '@/components/PropertyGallery';
+
+                // ... (Inside PropertyDetails component)
                 {/* Main Media Gallery */}
-                <div className="mb-16 rounded-2xl overflow-hidden shadow-glass border border-white/50 relative">
-                    <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar h-[400px] md:h-[600px] w-full hide-scrollbars relative group">
-                        {(() => {
-                            // Parse the JSON images array
-                            let imagesArray = [];
-                            try {
-                                if (prop.images) {
-                                    imagesArray = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
-                                }
-                            } catch (e) {
-                                console.error("Error parsing images:", e);
+                <div className="mb-16">
+                    {(() => {
+                        // Parse the JSON images array
+                        let imagesArray = [];
+                        try {
+                            if (prop.images) {
+                                imagesArray = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
                             }
+                        } catch (e) {
+                            console.error("Error parsing images:", e);
+                        }
 
-                            // Fallback if no images array, just use the single image_url
-                            if (!Array.isArray(imagesArray) || imagesArray.length === 0) {
-                                imagesArray = prop.image_url ? [prop.image_url] : [];
-                            }
+                        // Fallback if no images array, just use the single image_url
+                        if (!Array.isArray(imagesArray) || imagesArray.length === 0) {
+                            imagesArray = prop.image_url ? [prop.image_url] : [];
+                        }
 
-                            const allMedia = [...imagesArray];
-                            if (plan_url) allMedia.push({ type: 'plan', url: plan_url });
+                        const allMedia = [...imagesArray];
+                        if (plan_url) allMedia.push({ type: 'plan', url: plan_url });
 
-                            return allMedia.map((media, idx) => {
-                                const rawUrl = typeof media === 'string' ? media : media.url;
-                                const safeUrl = rawUrl?.startsWith('/uploads/') ? rawUrl.replace('/uploads/', '/api/uploads/') : rawUrl;
-                                return (
-                                    <div key={idx} className="flex-none w-full md:w-[80%] h-full relative snap-center snap-always border-r-4 border-cream cursor-pointer">
-                                        <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
-                                        <img
-                                            src={safeUrl}
-                                            alt={typeof media === 'string' ? `${title} - Imagen ${idx + 1}` : "Plano de la propiedad"}
-                                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
-                                        />
-                                        {typeof media !== 'string' && media.type === 'plan' && (
-                                            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/50 text-xs font-bold text-stone-dark tracking-wider uppercase z-20 shadow-sm pointer-events-none">
-                                                Plano Incluido
-                                            </div>
-                                        )}
-                                    </div>
-                                )
-                            });
-                        })()}
-                    </div>
+                        return <PropertyGallery media={allMedia} title={title} />;
+                    })()}
                 </div>
-
-                <style dangerouslySetInnerHTML={{
-                    __html: `
-                    .hide-scrollbars::-webkit-scrollbar { display: none; }
-                    .hide-scrollbars { -ms-overflow-style: none; scrollbar-width: none; }
-                `}} />
 
                 {/* Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
