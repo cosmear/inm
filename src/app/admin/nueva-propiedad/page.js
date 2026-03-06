@@ -39,7 +39,7 @@ export default function NuevaPropiedad() {
         area: '',
         expenses: '',
         credit_apt: false,
-        image_url: '', // This will hold the File object or local URL
+        images: [], // Array of File objects or URLs
         video_url: '',
         plan_url: '', // This will hold the File object or local URL
         title: '',
@@ -72,6 +72,25 @@ export default function NuevaPropiedad() {
         if (currentStep > 1) setCurrentStep(currentStep - 1);
     };
 
+    const handleMultipleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            setForm(prev => ({
+                ...prev,
+                images: [...prev.images, ...files]
+            }));
+        }
+        // Reset the input so the same files can be selected again if needed
+        e.target.value = null;
+    };
+
+    const removeImage = (index) => {
+        setForm(prev => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index)
+        }));
+    };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -79,11 +98,19 @@ export default function NuevaPropiedad() {
         }
     };
 
-    const uploadFile = async (file) => {
-        if (!file || typeof file === 'string') return file; // Already a URL or empty
+    const uploadFiles = async (filesArray) => {
+        if (!filesArray || filesArray.length === 0) return [];
+
+        // Filter out files that are already URLs (strings) vs actual File objects
+        const filesToUpload = filesArray.filter(f => f instanceof File);
+        const existingUrls = filesArray.filter(f => typeof f === 'string');
+
+        if (filesToUpload.length === 0) return existingUrls;
 
         const formData = new FormData();
-        formData.append('file', file);
+        filesToUpload.forEach(file => {
+            formData.append('files', file);
+        });
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
         const res = await fetch(`${apiUrl}/api/upload?token=${token}`, {
@@ -98,19 +125,39 @@ export default function NuevaPropiedad() {
         if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
             console.error("Upload Error:", errData);
-            throw new Error(`Error subiendo archivo: ${errData.details || res.statusText}`);
+            throw new Error(`Error subiendo archivos: ${errData.details || res.statusText}`);
         }
         const data = await res.json();
-        return data.url;
+        return [...existingUrls, ...(data.urls || [])];
+    };
+
+    // For single files like plan_url
+    const uploadSingleFile = async (file) => {
+        if (!file || typeof file === 'string') return file;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const res = await fetch(`${apiUrl}/api/upload?token=${token}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'x-access-token': token },
+            body: formData
+        });
+
+        if (!res.ok) throw new Error('Error subiendo archivo');
+        const data = await res.json();
+        return data.urls ? data.urls[0] : data.url;
     };
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         setLoading(true);
         try {
-            // Upload images first
-            const finalImageUrl = await uploadFile(form.image_url);
-            const finalPlanUrl = await uploadFile(form.plan_url);
+            // Upload multiple images
+            const finalImageUrls = await uploadFiles(form.images);
+
+            // Upload plan
+            const finalPlanUrl = await uploadSingleFile(form.plan_url);
 
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${apiUrl}/api/publications?token=${token}`, {
@@ -122,7 +169,7 @@ export default function NuevaPropiedad() {
                 },
                 body: JSON.stringify({
                     ...form,
-                    image_url: finalImageUrl || '',
+                    images: finalImageUrls, // Send the array
                     plan_url: finalPlanUrl || '',
                     area: Number(form.area) || 0,
                     area_covered: Number(form.area_covered) || 0,
@@ -140,7 +187,7 @@ export default function NuevaPropiedad() {
             }
         } catch (err) {
             console.error(err);
-            alert('Error al agregar publicación o subir imágenes. Verifica tu conexión.');
+            alert(`Error al agregar publicación o subir imágenes: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -393,21 +440,45 @@ export default function NuevaPropiedad() {
                                 <div className="space-y-6 animate-fade-in">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Imagen Principal (Requerida) *</label>
-                                            <div className="flex flex-col gap-3">
+                                            <label className="text-xs font-medium text-stone-dark/60 block mb-2">Imágenes (Podés seleccionar varias) *</label>
+                                            <div className="flex flex-col gap-4">
                                                 <input
                                                     type="file"
                                                     accept="image/*"
-                                                    name="image_url"
-                                                    onChange={handleFileChange}
+                                                    multiple
+                                                    onChange={handleMultipleFileChange}
                                                     className="block w-full text-sm text-stone-dark/70 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer bg-white border border-stone-dark/20 rounded-xl"
-                                                    required
                                                 />
-                                                {form.image_url && form.image_url instanceof File && (
-                                                    <div className="text-xs text-stone-dark/60 line-clamp-1">Seleccionado: {form.image_url.name}</div>
+
+                                                {form.images.length > 0 && (
+                                                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-stone-50 p-4 rounded-xl border border-stone-dark/10">
+                                                        {form.images.map((img, idx) => (
+                                                            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group border border-stone-dark/10 bg-white shadow-sm">
+                                                                <img
+                                                                    src={img instanceof File ? URL.createObjectURL(img) : img}
+                                                                    alt={`Preview ${idx + 1}`}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeImage(idx)}
+                                                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                                                    title="Eliminar imagen"
+                                                                >
+                                                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                                                </button>
+                                                                {idx === 0 && (
+                                                                    <div className="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[9px] text-center py-0.5 font-bold uppercase tracking-wider">
+                                                                        Portada
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 )}
-                                                {form.image_url && typeof form.image_url === 'string' && (
-                                                    <div className="text-xs text-stone-dark/60">Imagen ya cargada o desde URL.</div>
+
+                                                {form.images.length === 0 && (
+                                                    <p className="text-[#C10015] text-[10px] mt-1 ml-1">Debes incluir al menos una imagen.</p>
                                                 )}
                                             </div>
                                         </div>

@@ -6,11 +6,26 @@ const PropertyCard = ({ prop }) => {
         <Link href={`/propiedad/${prop.id}`} className="block h-full">
             <article className="group cursor-pointer flex flex-col h-full bg-white/60 backdrop-blur-md rounded-2xl overflow-hidden border border-white/60 shadow-sm transition-all duration-500 hover:shadow-glass hover:-translate-y-1">
                 <div className="relative overflow-hidden aspect-[4/3]">
-                    <img
-                        src={prop.image_url}
-                        alt={prop.title}
-                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
+                    {(() => {
+                        let coverImg = prop.image_url;
+                        try {
+                            if (prop.images) {
+                                const parsed = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    coverImg = parsed[0];
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error parsing images array', e);
+                        }
+                        return (
+                            <img
+                                src={coverImg}
+                                alt={prop.title}
+                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                            />
+                        );
+                    })()}
                     <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider text-stone-dark shadow-sm border border-white/50">
                         {prop.operation || 'Comprar'}
                     </div>

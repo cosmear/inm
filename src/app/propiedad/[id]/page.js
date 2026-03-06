@@ -69,25 +69,49 @@ export default async function PropertyDetails({ params }) {
                 </div>
 
                 {/* Main Media Gallery */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-16 h-[500px] md:h-[600px] w-full rounded-2xl overflow-hidden shadow-glass border border-white/50 relative group">
-                    <div className="w-full h-full relative cursor-pointer">
-                        <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
-                        <img src={image_url} alt={title} className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
+                <div className="mb-16 rounded-2xl overflow-hidden shadow-glass border border-white/50 relative">
+                    <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar h-[400px] md:h-[600px] w-full hide-scrollbars relative group">
+                        {(() => {
+                            // Parse the JSON images array
+                            let imagesArray = [];
+                            try {
+                                if (prop.images) {
+                                    imagesArray = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
+                                }
+                            } catch (e) { }
+
+                            // Fallback if no images array, just use the single image_url
+                            if (!Array.isArray(imagesArray) || imagesArray.length === 0) {
+                                imagesArray = [image_url];
+                            }
+
+                            const allMedia = [...imagesArray];
+                            if (plan_url) allMedia.push({ type: 'plan', url: plan_url });
+
+                            return allMedia.map((media, idx) => (
+                                <div key={idx} className="flex-none w-full md:w-[80%] h-full relative snap-center snap-always border-r-4 border-cream cursor-pointer">
+                                    <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
+                                    <img
+                                        src={typeof media === 'string' ? media : media.url}
+                                        alt={typeof media === 'string' ? `${title} - Imagen ${idx + 1}` : "Plano de la propiedad"}
+                                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
+                                    />
+                                    {typeof media !== 'string' && media.type === 'plan' && (
+                                        <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/50 text-xs font-bold text-stone-dark tracking-wider uppercase z-20 shadow-sm pointer-events-none">
+                                            Plano Incluido
+                                        </div>
+                                    )}
+                                </div>
+                            ));
+                        })()}
                     </div>
-                    {plan_url ? (
-                        <div className="hidden lg:block w-full h-full relative cursor-pointer border-l-4 border-cream">
-                            <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
-                            <img src={plan_url} alt="Plano de la propiedad" className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
-                            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/50 text-xs font-bold text-stone-dark tracking-wider uppercase z-20 shadow-sm pointer-events-none">
-                                Plano Incluido
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="hidden lg:flex w-full h-full items-center justify-center bg-stone-dark/5 border-l-4 border-cream">
-                            <span className="material-symbols-outlined text-6xl text-stone-dark/20">real_estate_agent</span>
-                        </div>
-                    )}
                 </div>
+
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    .hide-scrollbars::-webkit-scrollbar { display: none; }
+                    .hide-scrollbars { -ms-overflow-style: none; scrollbar-width: none; }
+                `}} />
 
                 {/* Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
@@ -229,7 +253,7 @@ export default async function PropertyDetails({ params }) {
                             <p className="text-sm text-stone-dark/60 mb-8">Contáctanos hoy mismo para coordinar una visita exclusiva o resolver cualquier duda.</p>
 
                             <div className="space-y-4">
-                                <a href={`https://wa.me/` /* Add real number */} target="_blank" rel="noopener noreferrer" className="w-full bg-[#25D366] hover:bg-[#1fb355] text-white py-4 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-[#25D366]/20 group">
+                                <a href={`https://wa.me/1234567890?text=${encodeURIComponent(`Hola, estoy interesado en tu aviso de "${title}". ¿Podríamos coordinar una visita? ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/propiedad/${id}`)}`} target="_blank" rel="noopener noreferrer" className="w-full bg-[#25D366] hover:bg-[#1fb355] text-white py-4 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-[#25D366]/20 group">
                                     <svg viewBox="0 0 24 24" fill="currentColor" className="size-5 group-hover:scale-110 transition-transform">
                                         <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"></path>
                                     </svg>

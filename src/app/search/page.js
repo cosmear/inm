@@ -18,7 +18,8 @@ const SearchContent = () => {
         ciudad: searchParams.get('ciudad') || '',
         location: searchParams.get('location') || '', // For backward compatibility
         maxPrice: '10000000',
-        bedrooms: 0
+        bedrooms: 0,
+        ambientes: 0
     });
 
     const fetchProperties = async () => {
@@ -33,6 +34,7 @@ const SearchContent = () => {
             if (filters.location) params.append('location', filters.location);
             if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
             if (filters.bedrooms > 0) params.append('bedrooms', filters.bedrooms);
+            if (filters.ambientes > 0) params.append('ambientes', filters.ambientes);
 
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${apiUrl}/api/publications?${params.toString()}`);
@@ -88,10 +90,11 @@ const SearchContent = () => {
                                         </div>
                                     )}
                                     <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Precio Máximo: ${parseInt(filters.maxPrice).toLocaleString()}</label><input type="range" name="maxPrice" min="0" max="10000000" step="100000" value={filters.maxPrice} onChange={handleFilterChange} className="w-full h-1 bg-stone-dark/10 rounded-lg appearance-none cursor-pointer accent-primary" /></div>
-                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Dormitorios (Mínimo)</label><div className="flex gap-2">{[1, 2, 3, 4].map(num => (<button key={num} onClick={() => setFilters(f => ({ ...f, bedrooms: num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.bedrooms === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-white/50'}`}>{num}+</button>))}</div></div>
+                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Ambientes (Mínimo)</label><div className="flex gap-2">{[1, 2, 3, 4].map(num => (<button key={`amb-${num}`} onClick={() => setFilters(f => ({ ...f, ambientes: num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.ambientes === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-white/50'}`}>{num}+</button>))}</div></div>
+                                    <div><label className="text-[10px] font-medium uppercase tracking-wider text-stone-dark/60 block mb-2">Dormitorios (Mínimo)</label><div className="flex gap-2">{[1, 2, 3, 4].map(num => (<button key={`dor-${num}`} onClick={() => setFilters(f => ({ ...f, bedrooms: num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.bedrooms === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-white/50'}`}>{num}+</button>))}</div></div>
                                 </div>
                             </div>
-                            <button onClick={() => setFilters({ operation: '', type: '', subtipo: '', provincia: '', ciudad: '', location: '', maxPrice: '10000000', bedrooms: 0 })} className="w-full py-4 text-[10px] font-medium uppercase tracking-wider text-stone-dark/50 hover:text-primary transition-colors border-t border-stone-dark/10">Limpiar Filtros</button>
+                            <button onClick={() => setFilters({ operation: '', type: '', subtipo: '', provincia: '', ciudad: '', location: '', maxPrice: '10000000', bedrooms: 0, ambientes: 0 })} className="w-full py-4 text-[10px] font-medium uppercase tracking-wider text-stone-dark/50 hover:text-primary transition-colors border-t border-stone-dark/10">Limpiar Filtros</button>
                         </div>
                     </aside>
                     <div className="w-full lg:w-3/4">
