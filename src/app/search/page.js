@@ -24,33 +24,45 @@ const SearchContent = () => {
         ambientes: 0
     });
 
-    const fetchProperties = async () => {
-        setLoading(true);
-        try {
-            const params = new URLSearchParams();
-            if (filters.operation) params.append('operation', filters.operation);
-            if (filters.type) params.append('type', filters.type);
-            if (filters.subtipo) params.append('subtipo', filters.subtipo);
-            if (filters.provincia) params.append('provincia', filters.provincia);
-            if (filters.ciudad) params.append('ciudad', filters.ciudad);
-            if (filters.location) params.append('location', filters.location);
-            if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-            if (filters.bedrooms > 0) params.append('bedrooms', filters.bedrooms);
-            if (filters.ambientes > 0) params.append('ambientes', filters.ambientes);
+    // Fix infinite loop by destructuring primitive values for dependency tracking
+    const { operation, type, subtipo, provincia, ciudad, location, maxPrice, bedrooms, ambientes } = filters;
 
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${apiUrl}/api/publications?${params.toString()}`);
-            if (res.ok) setProperties(await res.json());
-            else setProperties([]);
-        } catch (err) {
-            console.error('Error fetching properties:', err);
-            setProperties([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        const controller = new AbortController();
+        const signal = controller.signal;
 
-    useEffect(() => { fetchProperties(); }, [filters]);
+        const fetchProperties = async () => {
+            setLoading(true);
+            try {
+                const params = new URLSearchParams();
+                if (operation) params.append('operation', operation);
+                if (type) params.append('type', type);
+                if (subtipo) params.append('subtipo', subtipo);
+                if (provincia) params.append('provincia', provincia);
+                if (ciudad) params.append('ciudad', ciudad);
+                if (location) params.append('location', location);
+                if (maxPrice) params.append('maxPrice', maxPrice);
+                if (bedrooms > 0) params.append('bedrooms', bedrooms);
+                if (ambientes > 0) params.append('ambientes', ambientes);
+
+                const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+                const res = await fetch(`${apiUrl}/api/publications?${params.toString()}`, { signal });
+                if (res.ok) setProperties(await res.json());
+                else setProperties([]);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Error fetching properties:', err);
+                    setProperties([]);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProperties();
+
+        return () => controller.abort();
+    }, [operation, type, subtipo, provincia, ciudad, location, maxPrice, bedrooms, ambientes]);
 
     const handleFilterChange = (e) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     const handleOperationChange = (op) => setFilters(prev => ({ ...prev, operation: op }));
@@ -72,8 +84,8 @@ const SearchContent = () => {
                                     key={op || 'Todas'}
                                     onClick={() => handleOperationChange(op)}
                                     className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${filters.operation === op
-                                            ? 'bg-white text-primary shadow-sm'
-                                            : 'text-stone-dark/60 hover:text-stone-dark'
+                                        ? 'bg-white text-primary shadow-sm'
+                                        : 'text-stone-dark/60 hover:text-stone-dark'
                                         }`}
                                 >
                                     {op || 'Todas'}
@@ -109,8 +121,8 @@ const SearchContent = () => {
                         <button
                             onClick={() => setShowAdvanced(!showAdvanced)}
                             className={`shrink-0 flex items-center gap-2 px-5 py-3 rounded-xl border transition-all ${showAdvanced || filters.type || filters.bedrooms > 0 || filters.ambientes > 0 || filters.maxPrice !== '10000000'
-                                    ? 'bg-primary/10 border-primary/20 text-primary font-bold'
-                                    : 'bg-transparent border-stone-dark/10 text-stone-dark/70 hover:bg-stone-50 font-medium'
+                                ? 'bg-primary/10 border-primary/20 text-primary font-bold'
+                                : 'bg-transparent border-stone-dark/10 text-stone-dark/70 hover:bg-stone-50 font-medium'
                                 } text-sm`}
                         >
                             <span className="material-symbols-outlined text-lg">tune</span>
