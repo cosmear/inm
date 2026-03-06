@@ -594,7 +594,7 @@ export default function NuevaPropiedad() {
                                     <button
                                         type="button"
                                         onClick={handleSubmit}
-                                        disabled={loading || !form.title || !form.price || !form.description || !form.image_url}
+                                        disabled={loading || !form.title || !form.price || !form.description || form.images.length === 0}
                                         className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm transition-colors flex items-center gap-2"
                                     >
                                         {loading ? 'Publicando...' : 'Publicar Aviso'}
