@@ -31,8 +31,20 @@ export default async function PropertyDetails({ params }) {
         credit_apt, expenses
     } = prop;
 
-    const parsedAmenities = Array.isArray(amenities) ? amenities :
-        (typeof amenities === 'string' && amenities.trim() ? JSON.parse(amenities) : []);
+    let parsedAmenities = [];
+    try {
+        if (Array.isArray(amenities)) {
+            parsedAmenities = amenities;
+        } else if (typeof amenities === 'string' && amenities.trim()) {
+            if (amenities.startsWith('[')) {
+                parsedAmenities = JSON.parse(amenities);
+            } else {
+                parsedAmenities = amenities.split(',').map(s => s.trim()).filter(Boolean);
+            }
+        }
+    } catch (e) {
+        console.error("Error parsing amenities:", e);
+    }
 
     const displayLocation = (ciudad && provincia) ? `${ciudad}, ${provincia}` : location;
 
