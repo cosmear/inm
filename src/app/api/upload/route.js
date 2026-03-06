@@ -79,7 +79,7 @@ export async function POST(request) {
             const buffer = Buffer.from(await file.arrayBuffer());
             const extension = path.extname(file.name) || '.jpg';
             const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extension}`;
-            const relativeUrl = `/uploads/${filename}`;
+            const relativeUrl = `/api/uploads/${filename}`;
             const filePath = path.join(destinationDirPath, filename);
 
             await writeFile(filePath, buffer);

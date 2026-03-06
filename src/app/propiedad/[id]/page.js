@@ -102,21 +102,25 @@ export default async function PropertyDetails({ params }) {
                             const allMedia = [...imagesArray];
                             if (plan_url) allMedia.push({ type: 'plan', url: plan_url });
 
-                            return allMedia.map((media, idx) => (
-                                <div key={idx} className="flex-none w-full md:w-[80%] h-full relative snap-center snap-always border-r-4 border-cream cursor-pointer">
-                                    <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
-                                    <img
-                                        src={typeof media === 'string' ? media : media.url}
-                                        alt={typeof media === 'string' ? `${title} - Imagen ${idx + 1}` : "Plano de la propiedad"}
-                                        className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
-                                    />
-                                    {typeof media !== 'string' && media.type === 'plan' && (
-                                        <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/50 text-xs font-bold text-stone-dark tracking-wider uppercase z-20 shadow-sm pointer-events-none">
-                                            Plano Incluido
-                                        </div>
-                                    )}
-                                </div>
-                            ));
+                            return allMedia.map((media, idx) => {
+                                const rawUrl = typeof media === 'string' ? media : media.url;
+                                const safeUrl = rawUrl?.startsWith('/uploads/') ? rawUrl.replace('/uploads/', '/api/uploads/') : rawUrl;
+                                return (
+                                    <div key={idx} className="flex-none w-full md:w-[80%] h-full relative snap-center snap-always border-r-4 border-cream cursor-pointer">
+                                        <div className="absolute inset-0 bg-stone-dark/10 group-hover:bg-transparent transition-colors z-10 duration-500"></div>
+                                        <img
+                                            src={safeUrl}
+                                            alt={typeof media === 'string' ? `${title} - Imagen ${idx + 1}` : "Plano de la propiedad"}
+                                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
+                                        />
+                                        {typeof media !== 'string' && media.type === 'plan' && (
+                                            <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/50 text-xs font-bold text-stone-dark tracking-wider uppercase z-20 shadow-sm pointer-events-none">
+                                                Plano Incluido
+                                            </div>
+                                        )}
+                                    </div>
+                                )
+                            });
                         })()}
                     </div>
                 </div>

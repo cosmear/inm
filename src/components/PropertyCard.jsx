@@ -20,7 +20,7 @@ const PropertyCard = ({ prop }) => {
                         }
                         return (
                             <img
-                                src={coverImg}
+                                src={coverImg?.startsWith('/uploads/') ? coverImg.replace('/uploads/', '/api/uploads/') : coverImg}
                                 alt={prop.title}
                                 className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                             />
