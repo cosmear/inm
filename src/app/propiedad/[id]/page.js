@@ -78,11 +78,13 @@ export default async function PropertyDetails({ params }) {
                                 if (prop.images) {
                                     imagesArray = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
                                 }
-                            } catch (e) { }
+                            } catch (e) {
+                                console.error("Error parsing images:", e);
+                            }
 
                             // Fallback if no images array, just use the single image_url
                             if (!Array.isArray(imagesArray) || imagesArray.length === 0) {
-                                imagesArray = [image_url];
+                                imagesArray = prop.image_url ? [prop.image_url] : [];
                             }
 
                             const allMedia = [...imagesArray];
