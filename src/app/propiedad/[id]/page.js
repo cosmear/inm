@@ -93,7 +93,7 @@ export default async function PropertyDetails({ params }) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
                     {/* Left Column (Details) */}
-                    <div className="lg:col-span-8 space-y-16">
+                    <div className="lg:col-span-8 space-y-16 min-w-0">
 
                         {/* Quick Stats Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white rounded-2xl border border-stone-dark/5 shadow-sm">
@@ -141,8 +141,10 @@ export default async function PropertyDetails({ params }) {
                                 <span className="material-symbols-outlined text-primary">description</span>
                                 Descripción
                             </h3>
-                            <div className="prose prose-stone max-w-none prose-p:leading-relaxed prose-p:text-stone-dark/80 whitespace-pre-wrap">
-                                {description}
+                            <div className="bg-white border border-stone-dark/5 rounded-2xl p-6 md:p-8 shadow-sm">
+                                <div className="prose prose-stone max-w-none prose-p:leading-relaxed prose-p:text-stone-dark/80 whitespace-pre-wrap break-words">
+                                    {description}
+                                </div>
                             </div>
                         </div>
 
