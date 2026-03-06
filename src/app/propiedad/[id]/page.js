@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import PropertyGallery from '@/components/PropertyGallery';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,11 +80,6 @@ export default async function PropertyDetails({ params }) {
                         </div>
                     </div>
                 </div>
-
-// (Added at the top of the file)
-                import PropertyGallery from '@/components/PropertyGallery';
-
-                // ... (Inside PropertyDetails component)
                 {/* Main Media Gallery */}
                 <div className="mb-16">
                     {(() => {
@@ -268,7 +264,7 @@ export default async function PropertyDetails({ params }) {
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }
