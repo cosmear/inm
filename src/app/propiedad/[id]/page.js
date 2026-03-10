@@ -1,6 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import PropertyGallery from '@/components/PropertyGallery';
+import ContactForm from '@/components/ContactForm';
+import WhatsAppButton from '@/components/WhatsAppButton';
+import FavoriteButton from '@/components/FavoriteButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +12,45 @@ async function getProperty(id) {
     const res = await fetch(`${apiUrl}/api/publications/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return res.json();
+}
+
+export async function generateMetadata({ params }) {
+    const id = (await params).id;
+    const prop = await getProperty(id);
+
+    if (!prop) {
+        return { title: 'Propiedad no encontrada | Maison Argent' };
+    }
+
+    let imageUrl = prop.image_url;
+    try {
+        if (prop.images) {
+            const parsed = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                imageUrl = parsed[0];
+            }
+        }
+    } catch (e) {
+        console.error('Error parsing images array', e);
+    }
+
+    const host = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    // Remove duplicate API path if it's there
+    let baseUrl = host;
+    if (baseUrl.endsWith('/api')) {
+        baseUrl = baseUrl.substring(0, baseUrl.length - 4);
+    }
+    const ogImage = imageUrl?.startsWith('/uploads/') ? `${baseUrl}/api${imageUrl}` : imageUrl;
+
+    return {
+        title: `${prop.title} | Maison Argent`,
+        description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Maison Argent',
+        openGraph: {
+            title: prop.title,
+            description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Maison Argent',
+            images: [ogImage],
+        },
+    };
 }
 
 export default async function PropertyDetails({ params }) {
@@ -72,11 +114,14 @@ export default async function PropertyDetails({ params }) {
                                 {displayLocation}
                             </div>
                         </div>
-                        <div className="text-left md:text-right">
-                            <p className="font-serif text-4xl md:text-5xl text-primary font-medium tracking-tight whitespace-nowrap">
-                                USD {price?.toLocaleString()}
-                            </p>
-                            {expenses > 0 && <p className="text-sm font-medium text-stone-dark/50 mt-1 uppercase tracking-wider">+ Expensas: ${expenses.toLocaleString()}</p>}
+                        <div className="text-left md:text-right flex flex-col items-start md:items-end">
+                            <div className="flex items-center gap-4 mb-2">
+                                <FavoriteButton propertyId={id} />
+                                <p className="font-serif text-4xl md:text-5xl text-primary font-medium tracking-tight whitespace-nowrap">
+                                    USD {price?.toLocaleString()}
+                                </p>
+                            </div>
+                            {expenses > 0 && <p className="text-sm font-medium text-stone-dark/50 mt-1 uppercase tracking-wider flex justify-end w-full">+ Expensas: ${expenses.toLocaleString()}</p>}
                         </div>
                     </div>
                 </div>
@@ -245,17 +290,14 @@ export default async function PropertyDetails({ params }) {
                             <p className="text-sm text-stone-dark/60 mb-8">Contáctanos hoy mismo para coordinar una visita exclusiva o resolver cualquier duda.</p>
 
                             <div className="space-y-4">
-                                <a href={`https://wa.me/1234567890?text=${encodeURIComponent(`Hola, estoy interesado en tu aviso de "${title}". ¿Podríamos coordinar una visita? ${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/propiedad/${id}`)}`} target="_blank" rel="noopener noreferrer" className="w-full bg-[#25D366] hover:bg-[#1fb355] text-white py-4 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-[#25D366]/20 group">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" className="size-5 group-hover:scale-110 transition-transform">
-                                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564c.173.087.289.129.332.202.043.073.043.423-.101.827z"></path>
-                                    </svg>
-                                    <span className="font-bold text-sm uppercase tracking-wider">Contactar por WhatsApp</span>
-                                </a>
-
-                                <a href="mailto:info@maisonargent.com" className="w-full bg-stone-dark hover:bg-stone-dark/90 text-white py-4 rounded-xl flex items-center justify-center gap-3 transition-colors shadow-lg shadow-stone-dark/20 group">
-                                    <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">mail</span>
-                                    <span className="font-bold text-sm uppercase tracking-wider">Enviar Correo</span>
-                                </a>
+                                <ContactForm propertyId={id} propertyTitle={title} />
+                                <div className="py-2 flex items-center gap-4 before:h-px before:flex-1 before:bg-stone-dark/10 after:h-px after:flex-1 after:bg-stone-dark/10">
+                                    <span className="text-xs uppercase tracking-wider text-stone-dark/40 font-bold">O también</span>
+                                </div>
+                                <WhatsAppButton
+                                    propertyTitle={title}
+                                    propertyUrl={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3000'}/propiedad/${id}`}
+                                />
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-stone-dark/10">
