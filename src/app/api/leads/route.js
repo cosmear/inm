@@ -22,7 +22,7 @@ export async function POST(req) {
                 message TEXT,
                 status ENUM('new', 'contacted', 'discarded') DEFAULT 'new',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE SET NULL
+                FOREIGN KEY (property_id) REFERENCES publications(id) ON DELETE SET NULL
             )
         `);
 
