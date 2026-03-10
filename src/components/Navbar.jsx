@@ -29,6 +29,10 @@ const Navbar = () => {
                     <Link href="/search?operation=Alquiler" className="text-xs font-semibold text-stone-dark hover:text-primary uppercase tracking-wider transition-colors">Alquilar</Link>
                     {token ? (
                         <div className="flex items-center gap-3">
+                            <Link href="/admin/leads" className="hidden md:flex glass-card px-4 py-2 rounded-lg text-[11px] font-semibold text-primary hover:text-primary-dark uppercase tracking-wider transition-all shadow-sm items-center gap-2">
+                                <span className="material-symbols-outlined text-sm">contact_mail</span>
+                                Leads
+                            </Link>
                             <Link href="/admin/dashboard" className="glass-card px-4 py-2 rounded-lg text-[11px] font-semibold text-primary hover:text-primary-dark uppercase tracking-wider transition-all shadow-sm flex items-center gap-2">
                                 <span className="material-symbols-outlined text-sm">dashboard</span>
                                 Dashboard

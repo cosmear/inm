@@ -59,8 +59,19 @@ const Dashboard = () => {
                         </div>
                         <h2 className="font-serif text-2xl text-stone-dark mb-3">¿Nueva propiedad?</h2>
                         <p className="text-stone-dark/60 text-sm mb-8 px-4">Utiliza nuestro nuevo asistente paso a paso para publicarla fácilmente.</p>
-                        <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg transition-all text-center block">
+                        <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg transition-all text-center block mb-4">
                             Crear Nueva Propiedad
+                        </Link>
+
+                        <div className="w-full h-px bg-stone-dark/10 my-4"></div>
+
+                        <div className="size-12 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center mb-4 mt-2">
+                            <span className="material-symbols-outlined text-2xl">contact_mail</span>
+                        </div>
+                        <h3 className="font-serif text-xl text-stone-dark mb-2">Mensajes de Clientes</h3>
+                        <p className="text-stone-dark/60 text-xs mb-6 px-2">Revisa las consultas que te envían desde la web.</p>
+                        <Link href="/admin/leads" className="w-full bg-stone-100 hover:bg-stone-200 text-stone-dark font-medium py-3 rounded-xl uppercase tracking-wider text-[11px] transition-all text-center block border border-stone-200">
+                            Ver Panel de Consultas
                         </Link>
                     </div>
                 </aside>
