@@ -20,8 +20,11 @@ const Dashboard = () => {
     const fetchPublications = async () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${apiUrl}/api/publications`);
-            if (res.ok) setPublications(await res.json());
+            const res = await fetch(`${apiUrl}/api/publications?limit=1000`);
+            if (res.ok) {
+                const json = await res.json();
+                setPublications(json.data || json);
+            }
         } catch (err) {
             console.error('Error fetching publications:', err);
         }

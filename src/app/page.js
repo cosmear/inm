@@ -10,8 +10,9 @@ export default async function Home() {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
         const res = await fetch(`${apiUrl}/api/publications`, { cache: 'no-store' });
         if (res.ok) {
-            const data = await res.json();
-            publications = data.slice(0, 3);
+            const json = await res.json();
+            const arr = json.data || json; // Handle new or old format
+            publications = arr.slice(0, 3);
         }
     } catch (err) {
         console.error('Error fetching featured publications:', err);

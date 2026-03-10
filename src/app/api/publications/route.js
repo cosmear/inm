@@ -64,6 +64,12 @@ export async function GET(request) {
         const ambientes = searchParams.get('ambientes');
         const cocheras = searchParams.get('cocheras');
         const toilettes = searchParams.get('toilettes');
+        const amenities = searchParams.getAll('amenities'); // expects ?amenities=Pileta&amenities=Cochera
+
+        // Pagination
+        const page = parseInt(searchParams.get('page')) || 1;
+        const limit = parseInt(searchParams.get('limit')) || 24; // Default to 24 items per page
+        const offset = (page - 1) * limit;
 
         if (operation) {
             query += " AND operation = ?";
@@ -114,10 +120,34 @@ export async function GET(request) {
             params.push(parseInt(toilettes));
         }
 
-        query += " ORDER BY created_at DESC";
+        if (amenities && amenities.length > 0) {
+            // Check that the features field contains EACH of the requested amenities
+            amenities.forEach(amenity => {
+                query += " AND amenities LIKE ?";
+                params.push(`%${amenity}%`);
+            });
+        }
+
+        // 1. Get total count for pagination metadata
+        const countQuery = query.replace("SELECT *", "SELECT COUNT(*) as total");
+        const [countResult] = await pool.query(countQuery, params);
+        const total = countResult[0].total;
+
+        // 2. Fetch the paginated rows
+        query += " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        params.push(limit, offset);
 
         const [rows] = await pool.query(query, params);
-        return NextResponse.json(rows);
+
+        return NextResponse.json({
+            data: rows,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
