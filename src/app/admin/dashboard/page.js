@@ -89,9 +89,20 @@ const Dashboard = () => {
                         {publications.map(pub => (
                             <div key={pub.id} className="glass-card p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-primary/30 transition-all">
                                 <div className="flex items-center gap-6 w-full">
-                                    <div className="size-20 rounded-xl overflow-hidden shrink-0 shadow-sm"><img src={pub.image_url} alt={pub.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /></div>
+                                    <div className="size-20 rounded-xl overflow-hidden shrink-0 shadow-sm relative">
+                                        <img src={pub.image_url} alt={pub.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        {pub.status === 'draft' && <div className="absolute top-0 right-0 bg-stone-800 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">Borrador</div>}
+                                        {pub.status === 'reserved' && <div className="absolute top-0 right-0 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">R</div>}
+                                        {pub.status === 'sold' && <div className="absolute top-0 right-0 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">V</div>}
+                                    </div>
                                     <div className="flex-grow">
-                                        <div className="flex items-center gap-2 mb-1.5"><span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-primary/5 text-primary rounded border border-primary/10">{pub.operation}</span><span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-stone-dark/5 text-stone-dark/60 rounded border border-stone-dark/10">{pub.type}</span></div>
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-primary/5 text-primary rounded border border-primary/10">{pub.operation}</span>
+                                            <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-stone-dark/5 text-stone-dark/60 rounded border border-stone-dark/10">{pub.type}</span>
+                                            {pub.status === 'draft' && <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-stone-200 text-stone-600 rounded">Borrador</span>}
+                                            {pub.status === 'reserved' && <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-amber-100 text-amber-700 rounded">Reservada</span>}
+                                            {pub.status === 'sold' && <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-red-100 text-red-700 rounded">Vendida</span>}
+                                        </div>
                                         <h4 className="font-serif text-xl text-stone-dark line-clamp-1">{pub.title}</h4>
                                         <p className="text-stone-dark/60 text-xs font-medium tracking-wide mt-1">{pub.location} <span className="mx-1">•</span> ${pub.price?.toLocaleString()}</p>
                                     </div>

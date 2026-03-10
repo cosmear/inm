@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import jwt from 'jsonwebtoken';
+import sharp from 'sharp';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -75,16 +76,42 @@ export async function POST(request) {
         const uploadedUrls = [];
 
         // Process all files in parallel
-        await Promise.all(allFilesToProcess.map(async (file) => {
+        const uploadPromises = allFilesToProcess.map(async (file) => {
             const buffer = Buffer.from(await file.arrayBuffer());
-            const extension = path.extname(file.name) || '.jpg';
-            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${extension}`;
+            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.webp`;
             const relativeUrl = `/api/uploads/${filename}`;
             const filePath = path.join(destinationDirPath, filename);
 
-            await writeFile(filePath, buffer);
-            uploadedUrls.push(relativeUrl);
-        }));
+            try {
+                // Determine if file is an image based on mimetype or extension
+                const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file.name);
+
+                if (isImage) {
+                    // Compress and convert to webp using sharp
+                    await sharp(buffer)
+                        .webp({ quality: 80 }) // 80% quality is a very good balance between size and detail
+                        .toFile(filePath);
+                } else {
+                    // For non-images (like PDFs, plans), just write it as standard, keeping original extension
+                    const originalExt = path.extname(file.name);
+                    const docFilename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${originalExt}`;
+                    const docFilePath = path.join(destinationDirPath, docFilename);
+                    const docRelativeUrl = `/api/uploads/${docFilename}`;
+
+                    await writeFile(docFilePath, buffer);
+                    return docRelativeUrl;
+                }
+            } catch (err) {
+                console.error("Error processing file:", file.name, err);
+                // Fallback to direct write if sharp fails (e.g. damaged image)
+                await writeFile(filePath, buffer);
+            }
+
+            return relativeUrl;
+        });
+
+        const urls = await Promise.all(uploadPromises);
+        uploadedUrls.push(...urls);
 
         // Return urls array
         return NextResponse.json({ urls: uploadedUrls, success: true });

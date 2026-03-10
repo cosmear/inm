@@ -108,6 +108,8 @@ export default async function PropertyDetails({ params }) {
                                 <span className="bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">{operation}</span>
                                 <span className="bg-stone-dark/5 text-stone-dark/70 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">{subtipo || type}</span>
                                 {credit_apt === 1 && <span className="bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Apto Crédito</span>}
+                                {prop.status === 'reserved' && <span className="bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Reservada</span>}
+                                {prop.status === 'sold' && <span className="bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Vendida</span>}
                             </div>
                             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-dark mb-2 leading-tight">{title}</h1>
                             <div className="flex items-center gap-2 text-stone-dark/70 font-medium">

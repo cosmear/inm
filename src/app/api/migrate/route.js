@@ -20,6 +20,20 @@ export async function GET() {
             )
         `);
 
+        // Añadir columna status a publications si no existe
+        try {
+            await connection.query(`
+                ALTER TABLE publications 
+                ADD COLUMN status ENUM('published', 'draft', 'reserved', 'sold') DEFAULT 'published'
+            `);
+            console.log("Columna status añadida a publications");
+        } catch (error) {
+            // Error 1060 es ER_DUP_FIELDNAME (la columna ya existe)
+            if (error.errno !== 1060) {
+                throw error;
+            }
+        }
+
         connection.release();
 
         return NextResponse.json({ message: "Migración de base de datos exitosa" }, { status: 200 });

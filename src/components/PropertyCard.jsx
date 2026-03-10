@@ -29,9 +29,21 @@ const PropertyCard = ({ prop }) => {
                     <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider text-stone-dark shadow-sm border border-white/50">
                         {prop.operation || 'Comprar'}
                     </div>
-                    {prop.featured && (
+                    {prop.featured && prop.status !== 'sold' && prop.status !== 'reserved' && (
                         <div className="absolute top-4 right-4 bg-primary/95 backdrop-blur-md px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider text-white shadow-sm border border-primary/50">
                             Exclusivo
+                        </div>
+                    )}
+
+                    {/* Status Ribbons */}
+                    {prop.status === 'reserved' && (
+                        <div className="absolute top-4 right-4 bg-amber-500/95 backdrop-blur-md px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider text-white shadow-sm border border-amber-400">
+                            Reservada
+                        </div>
+                    )}
+                    {prop.status === 'sold' && (
+                        <div className="absolute top-4 right-4 bg-red-600/95 backdrop-blur-md px-3 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-wider text-white shadow-sm border border-red-500">
+                            Vendida
                         </div>
                     )}
                 </div>

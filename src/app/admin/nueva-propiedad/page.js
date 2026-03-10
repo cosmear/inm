@@ -45,7 +45,8 @@ export default function NuevaPropiedad() {
         title: '',
         description: '',
         price: '',
-        amenities: ''
+        amenities: '',
+        status: 'published'
     });
 
     useEffect(() => {
@@ -89,6 +90,20 @@ export default function NuevaPropiedad() {
             ...prev,
             images: prev.images.filter((_, i) => i !== index)
         }));
+    };
+
+    const moveImage = (index, direction) => {
+        setForm(prev => {
+            const newImages = [...prev.images];
+            if (direction === -1 && index > 0) {
+                // Move left
+                [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+            } else if (direction === 1 && index < newImages.length - 1) {
+                // Move right
+                [newImages[index + 1], newImages[index]] = [newImages[index], newImages[index + 1]];
+            }
+            return { ...prev, images: newImages };
+        });
     };
 
     const handleFileChange = (e) => {
@@ -453,20 +468,37 @@ export default function NuevaPropiedad() {
                                                 {form.images.length > 0 && (
                                                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-stone-50 p-4 rounded-xl border border-stone-dark/10">
                                                         {form.images.map((img, idx) => (
-                                                            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group border border-stone-dark/10 bg-white shadow-sm">
+                                                            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group border border-stone-dark/10 bg-white shadow-sm flex flex-col">
                                                                 <img
                                                                     src={img instanceof File ? URL.createObjectURL(img) : img}
                                                                     alt={`Preview ${idx + 1}`}
                                                                     className="w-full h-full object-cover"
                                                                 />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => removeImage(idx)}
-                                                                    className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-                                                                    title="Eliminar imagen"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-[14px]">close</span>
-                                                                </button>
+
+                                                                {/* Controls Overlay */}
+                                                                <div className="absolute inset-x-0 top-0 p-1 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-b from-black/50 to-transparent">
+                                                                    <div className="flex gap-1">
+                                                                        {idx > 0 && (
+                                                                            <button type="button" onClick={() => moveImage(idx, -1)} className="bg-white/90 text-stone-dark p-1 rounded hover:bg-white shadow-sm" title="Mover a la izquierda">
+                                                                                <span className="material-symbols-outlined text-[14px]">chevron_left</span>
+                                                                            </button>
+                                                                        )}
+                                                                        {idx < form.images.length - 1 && (
+                                                                            <button type="button" onClick={() => moveImage(idx, 1)} className="bg-white/90 text-stone-dark p-1 rounded hover:bg-white shadow-sm" title="Mover a la derecha">
+                                                                                <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeImage(idx)}
+                                                                        className="bg-red-500 text-white p-1 rounded hover:bg-red-600 shadow-sm"
+                                                                        title="Eliminar imagen"
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-[14px]">close</span>
+                                                                    </button>
+                                                                </div>
+
                                                                 {idx === 0 && (
                                                                     <div className="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[9px] text-center py-0.5 font-bold uppercase tracking-wider">
                                                                         Portada
@@ -561,6 +593,26 @@ export default function NuevaPropiedad() {
                                         <div className="md:col-span-2 pt-2">
                                             <label className="text-xs font-medium text-stone-dark/60 block mb-2">Amenities opcionales (Separados por coma)</label>
                                             <input type="text" name="amenities" value={form.amenities} onChange={handleChange} placeholder="Ej: Pileta, Gimnasio, Parrilla" className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary outline-none transition-all" />
+                                        </div>
+
+                                        <div className="md:col-span-2 pt-6 border-t border-stone-dark/10">
+                                            <h3 className="font-serif text-xl text-stone-dark mb-6">Estado de Publicación</h3>
+                                            <p className="text-stone-dark/60 text-sm mb-6 -mt-4">Define si la propiedad es visible al público y qué etiqueta de estado tiene.</p>
+
+                                            <div className="w-full md:w-1/2">
+                                                <label className="text-xs font-medium text-stone-dark/60 block mb-2">Estado *</label>
+                                                <select
+                                                    name="status"
+                                                    value={form.status}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                                >
+                                                    <option value="published">🟢 Publicada (Visible y Activa)</option>
+                                                    <option value="draft">🔘 Borrador (Oculta al público)</option>
+                                                    <option value="reserved">🟡 Reservada (Visible con listón)</option>
+                                                    <option value="sold">🔴 Vendida (Visible con listón)</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
