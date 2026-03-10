@@ -93,7 +93,14 @@ const Dashboard = () => {
                                         <p className="text-stone-dark/60 text-xs font-medium tracking-wide mt-1">{pub.location} <span className="mx-1">•</span> ${pub.price?.toLocaleString()}</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 shrink-0"><button onClick={() => handleDelete(pub.id)} className="size-10 rounded-xl bg-red-50/50 text-red-500 hover:bg-red-500 hover:text-white border border-red-100 transition-all flex items-center justify-center group/btn"><span className="material-symbols-outlined text-lg group-hover/btn:rotate-12 transition-transform">delete_sweep</span></button></div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <Link href={`/admin/editar-propiedad/${pub.id}`} className="size-10 rounded-xl bg-blue-50/50 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-100 transition-all flex items-center justify-center group/btn" title="Editar">
+                                        <span className="material-symbols-outlined text-lg group-hover/btn:-rotate-12 transition-transform">edit</span>
+                                    </Link>
+                                    <button onClick={() => handleDelete(pub.id)} className="size-10 rounded-xl bg-red-50/50 text-red-500 hover:bg-red-500 hover:text-white border border-red-100 transition-all flex items-center justify-center group/btn" title="Eliminar">
+                                        <span className="material-symbols-outlined text-lg group-hover/btn:rotate-12 transition-transform">delete_sweep</span>
+                                    </button>
+                                </div>
                             </div>
                         ))}
                         {publications.length === 0 && <div className="h-48 flex flex-col items-center justify-center glass-card rounded-2xl opacity-60 border-dashed border border-stone-dark/20"><span className="material-symbols-outlined text-4xl mb-4 text-stone-dark/40">add_home</span><p className="font-serif text-lg text-stone-dark/60 tracking-wide">Comienza agregando tu primera propiedad</p></div>}
