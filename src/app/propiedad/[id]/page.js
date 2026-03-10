@@ -4,14 +4,7 @@ import PropertyGallery from '@/components/PropertyGallery';
 import ContactForm from '@/components/ContactForm';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import FavoriteButton from '@/components/FavoriteButton';
-import dynamic from 'next/dynamic';
-
-const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
-    ssr: false,
-    loading: () => <div className="h-64 sm:h-80 w-full bg-stone-100 rounded-2xl flex items-center justify-center border border-stone-dark/10 shadow-inner z-0 relative">
-        <span className="material-symbols-outlined animate-spin text-primary text-3xl">refresh</span>
-    </div>
-});
+import PropertyMapWrapper from '@/components/PropertyMapWrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -278,7 +271,7 @@ export default async function PropertyDetails({ params }) {
                                     <span className="material-symbols-outlined text-primary">pin_drop</span>
                                     Ubicación
                                 </h3>
-                                <PropertyMap location={location} ciudad={ciudad} provincia={provincia} />
+                                <PropertyMapWrapper location={location} ciudad={ciudad} provincia={provincia} />
                             </div>
                         )}
 
