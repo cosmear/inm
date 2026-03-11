@@ -32,14 +32,14 @@ export default async function Home() {
                         <div className="absolute inset-0 bg-stone-dark/40 backdrop-blur-[2px]"></div>
                     </div>
 
-                    <div className="relative z-10 text-center px-6 max-w-4xl">
+                    <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
                         <span className="text-primary font-bold tracking-[0.2em] text-[10px] uppercase mb-4 block drop-shadow-md">Inmobiliaria Boutique</span>
                         <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-10 leading-[0.9] drop-shadow-2xl">
                             Redefiniendo el <br /> <i className="font-normal opacity-90">Lujo Argentino</i>
                         </h2>
 
                         {/* Search Bar */}
-                        <div className="bg-white/20 backdrop-blur-2xl p-2 rounded-2xl border border-white/30 shadow-2xl max-w-3xl mx-auto transform hover:scale-[1.02] transition-transform duration-500">
+                        <div className="bg-white/20 backdrop-blur-2xl p-2 rounded-2xl border border-white/30 shadow-2xl w-full max-w-5xl mx-auto transform hover:scale-[1.02] transition-transform duration-500">
                             <div className="bg-white rounded-xl flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-stone-dark/10 overflow-hidden">
                                 <Link href="/search?operation=Venta" className="flex-1 px-8 py-4 hover:bg-primary/5 transition-colors text-left group">
                                     <span className="text-[9px] font-semibold uppercase tracking-widest text-primary/80 block mb-1 group-hover:translate-x-1 transition-transform">Venta</span>

@@ -157,7 +157,7 @@ export default async function PropertyDetails({ params }) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
                     {/* Left Column (Details) */}
-                    <div className="lg:col-span-8 space-y-16 min-w-0">
+                    <div className="lg:col-span-7 space-y-16 min-w-0">
 
                         {/* Quick Stats Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white rounded-2xl border border-stone-dark/5 shadow-sm">
@@ -298,7 +298,7 @@ export default async function PropertyDetails({ params }) {
                     </div>
 
                     {/* Right Column (Contact Widget) */}
-                    <div className="lg:col-span-4 relative">
+                    <div className="lg:col-span-5 relative">
                         <div className="sticky top-32 glass-card p-8 rounded-3xl border border-white/60 shadow-glass">
                             <h4 className="font-serif text-2xl text-stone-dark mb-2">¿Te interesa esta propiedad?</h4>
                             <p className="text-sm text-stone-dark/60 mb-8">Contáctanos hoy mismo para coordinar una visita exclusiva o resolver cualquier duda.</p>
