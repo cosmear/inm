@@ -16,7 +16,14 @@ L.Icon.Default.mergeOptions({
 
 function ChangeView({ center, zoom }) {
     const map = useMap();
-    map.setView(center, zoom);
+    
+    // Only move the map when the explicit coordinates change to avoid snapping back if user pans manually
+    useEffect(() => {
+        if (center && center.length === 2) {
+            map.flyTo(center, zoom);
+        }
+    }, [center[0], center[1], zoom, map]);
+
     return null;
 }
 
@@ -31,15 +38,47 @@ export default function AdminPropertyMap({ location, ciudad, provincia, initialL
     const [mapCenter, setMapCenter] = useState(
         (initialLat && initialLng) ? [initialLat, initialLng] : defaultCenter
     );
-    const [loading, setLoading] = useState(!initialLat);
+    const [isGeocoding, setIsGeocoding] = useState(false);
     const markerRef = useRef(null);
 
-    // Geocode the address if we don't have initial coordinates
+    // Track previous props to differentiate user typing vs DB loading
+    const addressString = `${location || ''}, ${ciudad || ''}, ${provincia || ''}`;
+    const prevAddressRef = useRef(addressString);
+    const prevLatRef = useRef(initialLat);
+
     useEffect(() => {
-        // Only run geocoding if we lack absolute positioning, but we DO have string data
-        if ((!initialLat || !initialLng) && (location || ciudad || provincia)) {
+        const addressChanged = addressString !== prevAddressRef.current;
+        const latChanged = initialLat !== prevLatRef.current;
+
+        prevAddressRef.current = addressString;
+        prevLatRef.current = initialLat;
+
+        // If both address and lat changed at the exact same time, it's a DB load.
+        // Use the loaded coordinates directly, avoid geocoding.
+        if (latChanged && addressChanged && initialLat && initialLng) {
+            setPosition([initialLat, initialLng]);
+            setMapCenter([initialLat, initialLng]);
+            return;
+        }
+
+        // If only coordinate changed (user dragged marker, or geocoding finished), just update the local map view
+        if (!addressChanged && latChanged && initialLat && initialLng) {
+            setPosition([initialLat, initialLng]);
+            setMapCenter([initialLat, initialLng]);
+            return;
+        }
+
+        // If ONLY the address changed (or it loaded from DB but had NO previous coordinates), we must Geocode
+        if (addressChanged) {
+            const hasMeaningfulAddress = location || ciudad || provincia;
+
+            if (!hasMeaningfulAddress) {
+                // Address was cleared
+                return;
+            }
+
             const fetchCoordinates = async () => {
-                setLoading(true);
+                setIsGeocoding(true);
                 try {
                     const queryParts = [];
                     if (location) queryParts.push(location);
@@ -66,30 +105,25 @@ export default function AdminPropertyMap({ location, ciudad, provincia, initialL
                             
                             setPosition(newPos);
                             setMapCenter(newPos);
-                            // Notify parent
+                            // Notify parent of the newly discovered coordinates
                             if (onCoordinatesChange) onCoordinatesChange(newLat, newLng);
                         }
                     }
                 } catch (err) {
                     console.error("Geocoding failed", err);
                 } finally {
-                    setLoading(false);
+                    setIsGeocoding(false);
                 }
             };
             
-            // Add a small debounce to avoid hammering the Nominatim API while typing
+            // Add a debounce to avoid hammering the API while typing
             const timeoutId = setTimeout(() => {
                 fetchCoordinates();
-            }, 1000);
+            }, 1200);
             
             return () => clearTimeout(timeoutId);
-        } else if (initialLat && initialLng) {
-            // If props change from outside (e.g., loaded from DB)
-            setPosition([initialLat, initialLng]);
-            setMapCenter([initialLat, initialLng]);
-            setLoading(false);
         }
-    }, [location, ciudad, provincia, initialLat, initialLng, onCoordinatesChange]);
+    }, [addressString, location, ciudad, provincia, initialLat, initialLng, onCoordinatesChange]);
 
     const eventHandlers = useMemo(
         () => ({
@@ -100,7 +134,7 @@ export default function AdminPropertyMap({ location, ciudad, provincia, initialL
                     const newLat = latLng.lat;
                     const newLng = latLng.lng;
                     setPosition([newLat, newLng]);
-                    // Only notify parent, do NOT show to user
+                    // Notify parent, do NOT show to user
                     if (onCoordinatesChange) {
                         onCoordinatesChange(newLat, newLng);
                     }
@@ -110,22 +144,19 @@ export default function AdminPropertyMap({ location, ciudad, provincia, initialL
         [onCoordinatesChange]
     );
 
-    if (loading) {
-        return (
-            <div className="h-64 sm:h-80 w-full bg-stone-100 rounded-2xl flex items-center justify-center border border-stone-dark/10 shadow-inner z-0 relative">
-                <div className="flex flex-col items-center text-primary">
-                     <span className="material-symbols-outlined animate-spin text-3xl mb-2">refresh</span>
-                     <span className="text-sm font-medium">Buscando ubicación en el mapa...</span>
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className="flex flex-col gap-2">
-            <span className="text-xs font-medium text-stone-dark/60 block mb-1">
-                Ajuste fino de ubicación: Arrastrá el pin rojo para marcar la posición exacta
-            </span>
+        <div className="flex flex-col gap-2 relative">
+            <div className="flex items-center justify-between mb-1">
+                 <span className="text-xs font-medium text-stone-dark/60">
+                    Ajuste fino de ubicación: Arrastrá el pin rojo para marcar la posición exacta
+                 </span>
+                 {isGeocoding && (
+                     <span className="text-xs font-medium text-primary flex items-center gap-1">
+                         <span className="material-symbols-outlined animate-spin text-[14px]">refresh</span>
+                         Actualizando...
+                     </span>
+                 )}
+            </div>
             <div className="h-64 sm:h-80 w-full rounded-2xl overflow-hidden shadow-inner border border-stone-dark/20 relative z-0">
                 <MapContainer center={mapCenter} zoom={15} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                     <ChangeView center={mapCenter} zoom={15} />
