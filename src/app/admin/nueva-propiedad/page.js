@@ -5,7 +5,16 @@ import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { propertyTypes, provinces } from '@/lib/constants';
-import AdminPropertyMap from '@/components/AdminPropertyMap';
+import dynamic from 'next/dynamic';
+
+const AdminPropertyMap = dynamic(() => import('@/components/AdminPropertyMap'), {
+    ssr: false,
+    loading: () => (
+        <div className="h-64 sm:h-80 w-full bg-stone-100 rounded-2xl flex items-center justify-center border border-stone-dark/10 shadow-inner z-0 relative">
+            <span className="material-symbols-outlined animate-spin text-primary text-3xl">refresh</span>
+        </div>
+    )
+});
 
 const steps = [
     { id: 1, name: 'Principales' },
