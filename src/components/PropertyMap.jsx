@@ -20,9 +20,9 @@ function ChangeView({ center, zoom }) {
     return null;
 }
 
-export default function PropertyMap({ location, ciudad, provincia }) {
-    const [coordinates, setCoordinates] = useState(null);
-    const [loading, setLoading] = useState(true);
+export default function PropertyMap({ location, ciudad, provincia, lat, lng }) {
+    const [coordinates, setCoordinates] = useState((lat && lng) ? [lat, lng] : null);
+    const [loading, setLoading] = useState(!(lat && lng));
 
     useEffect(() => {
         const fetchCoordinates = async () => {
@@ -60,12 +60,19 @@ export default function PropertyMap({ location, ciudad, provincia }) {
             }
         };
 
+        // If we already have precise coordinates, skip geocoding
+        if (lat && lng) {
+            setCoordinates([lat, lng]);
+            setLoading(false);
+            return;
+        }
+
         if (location || ciudad || provincia) {
             fetchCoordinates();
         } else {
             setLoading(false);
         }
-    }, [location, ciudad, provincia]);
+    }, [location, ciudad, provincia, lat, lng]);
 
     if (loading) {
         return <div className="h-64 sm:h-80 w-full bg-stone-100 rounded-2xl flex items-center justify-center border border-stone-dark/10 shadow-inner z-0 relative">

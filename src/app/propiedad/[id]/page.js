@@ -72,7 +72,7 @@ export default async function PropertyDetails({ params }) {
         provincia, ciudad, image_url, plan_url, video_url,
         bedrooms, bathrooms, ambientes, cocheras, toilettes,
         area, area_covered, age, amenities,
-        credit_apt, expenses
+        credit_apt, expenses, lat, lng
     } = prop;
 
     let parsedAmenities = [];
@@ -273,7 +273,7 @@ export default async function PropertyDetails({ params }) {
                                     <span className="material-symbols-outlined text-primary">pin_drop</span>
                                     Ubicación
                                 </h3>
-                                <PropertyMapWrapper location={location} ciudad={ciudad} provincia={provincia} />
+                                <PropertyMapWrapper location={location} ciudad={ciudad} provincia={provincia} lat={lat} lng={lng} />
                             </div>
                         )}
 

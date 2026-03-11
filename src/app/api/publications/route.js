@@ -178,8 +178,8 @@ export async function POST(request) {
         const mainImageUrl = imagesList.length > 0 ? imagesList[0] : '';
 
         const [result] = await pool.query(
-            `INSERT INTO publications (title, description, price, image_url, images, location, type, operation, bedrooms, bathrooms, area, amenities, featured, subtipo, provincia, ciudad, area_covered, ambientes, toilettes, cocheras, video_url, plan_url, age, expenses, credit_apt, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [data.title, data.description, data.price, mainImageUrl, imagesJson, data.location, data.type, data.operation, data.bedrooms, data.bathrooms, data.area, data.amenities, data.featured ? 1 : 0, data.subtipo, data.provincia, data.ciudad, data.area_covered, data.ambientes, data.toilettes, data.cocheras, data.video_url, data.plan_url, data.age, data.expenses, data.credit_apt ? 1 : 0, data.status || 'published']
+            `INSERT INTO publications (title, description, price, image_url, images, location, type, operation, bedrooms, bathrooms, area, amenities, featured, subtipo, provincia, ciudad, area_covered, ambientes, toilettes, cocheras, video_url, plan_url, age, expenses, credit_apt, status, lat, lng) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [data.title, data.description, data.price, mainImageUrl, imagesJson, data.location, data.type, data.operation, data.bedrooms, data.bathrooms, data.area, data.amenities, data.featured ? 1 : 0, data.subtipo, data.provincia, data.ciudad, data.area_covered, data.ambientes, data.toilettes, data.cocheras, data.video_url, data.plan_url, data.age, data.expenses, data.credit_apt ? 1 : 0, data.status || 'published', data.lat || null, data.lng || null]
         );
         return NextResponse.json({ id: result.insertId });
     } catch (err) {

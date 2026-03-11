@@ -5,6 +5,7 @@ import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { propertyTypes, provinces } from '@/lib/constants';
+import AdminPropertyMap from '@/components/AdminPropertyMap';
 
 const steps = [
     { id: 1, name: 'Principales' },
@@ -28,6 +29,8 @@ export default function NuevaPropiedad() {
         location: '',
         provincia: '',
         ciudad: '',
+        lat: null,
+        lng: null,
         ambientes: 0,
         bedrooms: 0,
         bathrooms: 0,
@@ -186,6 +189,8 @@ export default function NuevaPropiedad() {
                     ...form,
                     images: finalImageUrls, // Send the array
                     plan_url: finalPlanUrl || '',
+                    lat: form.lat,
+                    lng: form.lng,
                     area: Number(form.area) || 0,
                     area_covered: Number(form.area_covered) || 0,
                     price: Number(form.price) || 0,
@@ -365,6 +370,19 @@ export default function NuevaPropiedad() {
                                                 className="w-full bg-white border border-stone-dark/20 text-stone-dark rounded-xl px-4 py-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                             />
                                         </div>
+                                    </div>
+                                    
+                                    <div className="pt-2">
+                                        <AdminPropertyMap 
+                                            location={form.location}
+                                            ciudad={form.ciudad}
+                                            provincia={form.provincia}
+                                            initialLat={form.lat}
+                                            initialLng={form.lng}
+                                            onCoordinatesChange={(newLat, newLng) => {
+                                                setForm(prev => ({ ...prev, lat: newLat, lng: newLng }));
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             )}

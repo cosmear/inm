@@ -5,6 +5,7 @@ import { useAuth } from '@/components/AuthContext';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { propertyTypes, provinces } from '@/lib/constants';
+import AdminPropertyMap from '@/components/AdminPropertyMap';
 
 const steps = [
     { id: 1, name: 'Principales' },
@@ -30,6 +31,8 @@ export default function EditarPropiedad() {
         location: '',
         provincia: '',
         ciudad: '',
+        lat: null,
+        lng: null,
         ambientes: 0,
         bedrooms: 0,
         bathrooms: 0,
@@ -90,6 +93,8 @@ export default function EditarPropiedad() {
                 location: data.location || '',
                 provincia: data.provincia || '',
                 ciudad: data.ciudad || '',
+                lat: data.lat || null,
+                lng: data.lng || null,
                 ambientes: data.ambientes || 0,
                 bedrooms: data.bedrooms || 0,
                 bathrooms: data.bathrooms || 0,
@@ -242,6 +247,8 @@ export default function EditarPropiedad() {
                     ...form,
                     images: finalImageUrls,
                     plan_url: finalPlanUrl || '',
+                    lat: form.lat,
+                    lng: form.lng,
                     area: Number(form.area) || 0,
                     area_covered: Number(form.area_covered) || 0,
                     price: Number(form.price) || 0,
@@ -392,6 +399,19 @@ export default function EditarPropiedad() {
                                             <label className="text-xs font-medium text-stone-dark/60 block mb-2">Ciudad</label>
                                             <input type="text" name="ciudad" value={form.ciudad} onChange={handleChange} className="w-full bg-white border border-stone-dark/20 rounded-xl px-4 py-3 text-sm focus:border-primary outline-none" />
                                         </div>
+                                    </div>
+                                    
+                                    <div className="pt-2">
+                                        <AdminPropertyMap 
+                                            location={form.location}
+                                            ciudad={form.ciudad}
+                                            provincia={form.provincia}
+                                            initialLat={form.lat}
+                                            initialLng={form.lng}
+                                            onCoordinatesChange={(newLat, newLng) => {
+                                                setForm(prev => ({ ...prev, lat: newLat, lng: newLng }));
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             )}
