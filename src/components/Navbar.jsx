@@ -21,7 +21,7 @@ const Navbar = () => {
                     <div className="size-8 bg-primary rounded-xl flex items-center justify-center text-white transition-transform group-hover:rotate-12">
                         <span className="material-symbols-outlined !text-[20px]">villa</span>
                     </div>
-                    <h1 className="font-serif text-2xl font-medium tracking-tight">Maison Argent</h1>
+                    <h1 className="font-serif text-2xl font-medium tracking-tight">Julia Guillot</h1>
                 </Link>
 
                 <nav className="flex items-center gap-6 md:gap-10">

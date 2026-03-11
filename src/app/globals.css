@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #4A5D23; /* Slightly deeper, more elegant olive */
-  --color-primary-dark: #36451A;
-  --color-cream: #FCFAF5; /* Lighter cream, less yellow/heavy */
-  --color-stone-dark: #2C331F;
-  --color-stone-light: #8C9283;
-  --color-taupe: #8B8680;
+  --color-primary: #44001b; /* Rosa oscuro */
+  --color-primary-dark: #2a0011; /* Darker rosa oscuro */
+  --color-cream: #faf5ee; /* Naranja claro */
+  --color-stone-dark: #1e1e1e; /* Gris oscuro */
+  --color-stone-light: #b3b5b3; /* Gris claro */
+  --color-taupe: #5e5f60; /* Gris */
   
   --font-display: "Manrope", ui-sans-serif, system-ui;
   --font-serif: "Playfair Display", ui-serif, Georgia;
 
-  --shadow-glass: 0 4px 40px -2px rgba(44, 51, 31, 0.06);
+  --shadow-glass: 0 4px 40px -2px rgba(30, 30, 30, 0.06);
 }
 
 @layer base {

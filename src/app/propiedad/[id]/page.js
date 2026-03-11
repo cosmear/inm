@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
     const prop = await getProperty(id);
 
     if (!prop) {
-        return { title: 'Propiedad no encontrada | Maison Argent' };
+        return { title: 'Propiedad no encontrada | Julia Guillot' };
     }
 
     let imageUrl = prop.image_url;
@@ -44,11 +44,11 @@ export async function generateMetadata({ params }) {
     const ogImage = imageUrl?.startsWith('/uploads/') ? `${baseUrl}/api${imageUrl}` : imageUrl;
 
     return {
-        title: `${prop.title} | Maison Argent`,
-        description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Maison Argent',
+        title: `${prop.title} | Julia Guillot`,
+        description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Julia Guillot',
         openGraph: {
             title: prop.title,
-            description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Maison Argent',
+            description: prop.description?.substring(0, 160) || 'Propiedad exclusiva en Julia Guillot',
             images: [ogImage],
         },
     };

@@ -9,7 +9,7 @@ const Footer = () => {
                     <div className="md:col-span-1">
                         <div className="flex items-center gap-3 mb-8 text-cream">
                             <span className="material-symbols-outlined !text-[28px]">villa</span>
-                            <h2 className="font-serif text-2xl font-medium">Maison Argent</h2>
+                            <h2 className="font-serif text-2xl font-medium">Julia Guillot</h2>
                         </div>
                         <p className="text-stone-light text-sm leading-relaxed max-w-xs">
                             Conectando personas extraordinarias con propiedades excepcionales a lo largo de toda Argentina.
@@ -49,7 +49,7 @@ const Footer = () => {
                 </div>
 
                 <div className="flex flex-col md:flex-row items-center justify-between text-[10px] uppercase tracking-widest text-stone-light/50 gap-4">
-                    <p>© 2024 Maison Argent. Todos los derechos reservados.</p>
+                    <p>© 2026 Julia Guillot. Todos los derechos reservados.</p>
                     <div className="flex gap-8">
                         <a href="#" className="hover:text-white transition-colors">Privacidad</a>
                         <a href="#" className="hover:text-white transition-colors">Términos</a>

@@ -148,7 +148,7 @@ export default function AdminPropertyMap({ location, ciudad, provincia, initialL
         <div className="flex flex-col gap-2 relative">
             <div className="flex items-center justify-between mb-1">
                  <span className="text-xs font-medium text-stone-dark/60">
-                    Ajuste fino de ubicación: Arrastrá el pin rojo para marcar la posición exacta
+                    Ajuste fino de ubicación: Arrastrá el pin azul para marcar la posición exacta
                  </span>
                  {isGeocoding && (
                      <span className="text-xs font-medium text-primary flex items-center gap-1">

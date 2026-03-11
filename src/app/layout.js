@@ -8,7 +8,7 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
-    title: "Maison Argent | Luxury Real Estate",
+    title: "Julia Guillot | Luxury Real Estate",
     description: "Redefiniendo el Lujo Argentino",
 };
 
