@@ -12,8 +12,10 @@ const SearchContent = () => {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 12, total: 0, totalPages: 0 });
+    const [activeOperations, setActiveOperations] = useState([]);
 
+    // Local state for all filters
     const [filters, setFilters] = useState({
         operation: searchParams.get('operation') || '',
         type: searchParams.get('type') || '',
@@ -27,6 +29,30 @@ const SearchContent = () => {
         ambientes: 0,
         amenities: []
     });
+
+    // Keep the local state in sync if the URL changes (e.g., clicking Header links)
+    useEffect(() => {
+        const urlOp = searchParams.get('operation');
+        if (urlOp !== null) {
+            setFilters(prev => prev.operation !== urlOp ? { ...prev, operation: urlOp } : prev);
+        }
+    }, [searchParams]);
+
+    // Fetch active operations for dynamic tabs
+    useEffect(() => {
+        const fetchOperations = async () => {
+            try {
+                const res = await fetch('/api/active-operations');
+                if (res.ok) {
+                    const data = await res.json();
+                    setActiveOperations(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch active operations:", err);
+            }
+        };
+        fetchOperations();
+    }, []);
 
     // Fix infinite loop by destructuring primitive values for dependency tracking
     const { operation, type, subtipo, provincia, ciudad, location, minPrice, maxPrice, bedrooms, ambientes } = filters;
@@ -158,23 +184,38 @@ const SearchContent = () => {
                     <div className="flex flex-col md:flex-row items-center gap-4">
 
                         {/* Operation Tabs */}
-                        <div className="flex bg-stone-100 p-1 rounded-xl shrink-0">
-                            {['', 'Venta', 'Alquiler', 'Temporada'].map(op => (
-                                <button
-                                    key={op || 'Todas'}
-                                    onClick={() => handleOperationChange(op)}
-                                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${filters.operation === op
-                                        ? 'bg-white text-primary shadow-sm'
-                                        : 'text-stone-dark/60 hover:text-stone-dark'
-                                        }`}
-                                >
-                                    {op || 'Todas'}
-                                </button>
-                            ))}
+                        <div className="flex bg-stone-100 p-1 rounded-xl shrink-0 overflow-x-auto hide-scrollbar">
+                            <button
+                                onClick={() => handleOperationChange('')}
+                                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${!filters.operation
+                                    ? 'bg-white text-primary shadow-sm'
+                                    : 'text-stone-dark/60 hover:text-stone-dark'
+                                    }`}
+                            >
+                                Todas
+                            </button>
+                            {/* Render only dynamically loaded operations */}
+                            {['Venta', 'Alquiler', 'Temporada', 'Proyecto'].map(op => {
+                                if (activeOperations.includes(op)) {
+                                    return (
+                                        <button
+                                            key={op}
+                                            onClick={() => handleOperationChange(op)}
+                                            className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 ${filters.operation === op
+                                                ? 'bg-white text-primary shadow-sm'
+                                                : 'text-stone-dark/60 hover:text-stone-dark'
+                                                }`}
+                                        >
+                                            {op === 'Proyecto' ? 'Proyectos' : op}
+                                        </button>
+                                    );
+                                }
+                                return null;
+                            })}
                         </div>
 
                         {/* Quick Search Inputs */}
-                        <div className="flex-grow flex gap-4 w-full md:w-auto">
+                        <div className="grow flex gap-4 w-full md:w-auto">
                             <select
                                 name="provincia"
                                 value={filters.provincia}
@@ -233,49 +274,51 @@ const SearchContent = () => {
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Habitaciones (Min)</label>
-                                    <div className="flex gap-2">
-                                        {[1, 2, 3, 4].map(num => (
-                                            <button key={`dor-${num}`} onClick={() => setFilters(f => ({ ...f, bedrooms: f.bedrooms === num ? 0 : num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.bedrooms === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-stone-50'}`}>{num}+</button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Ambientes (Min)</label>
-                                    <div className="flex gap-2">
-                                        {[1, 2, 3, 4].map(num => (
-                                            <button key={`amb-${num}`} onClick={() => setFilters(f => ({ ...f, ambientes: f.ambientes === num ? 0 : num }))} className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${filters.ambientes === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-stone-50'}`}>{num}+</button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="lg:col-span-2">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">
-                                        Rango de Precio (US$)
-                                    </label>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-1">
-                                            <input
-                                                type="number"
-                                                name="minPrice"
-                                                value={filters.minPrice}
-                                                onChange={handleFilterChange}
-                                                placeholder="Mínimo"
-                                                className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-stone-dark/30"
-                                            />
+                                <div className="md:col-span-2 lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Hab. (Min)</label>
+                                        <div className="flex gap-1.5">
+                                            {[1, 2, 3, 4].map(num => (
+                                                <button key={`dor-${num}`} onClick={() => setFilters(f => ({ ...f, bedrooms: f.bedrooms === num ? 0 : num }))} className={`w-8 h-8 md:w-9 md:h-9 rounded-lg border flex items-center justify-center transition-all ${filters.bedrooms === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-stone-50'} text-xs font-medium`}>{num}+</button>
+                                            ))}
                                         </div>
-                                        <span className="text-stone-dark/40 font-medium">-</span>
-                                        <div className="flex-1">
-                                            <input
-                                                type="number"
-                                                name="maxPrice"
-                                                value={filters.maxPrice !== '10000000' && filters.maxPrice !== '0' ? filters.maxPrice : ''}
-                                                onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value || '10000000' }))}
-                                                placeholder="Máximo"
-                                                className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-stone-dark/30"
-                                            />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Amb. (Min)</label>
+                                        <div className="flex gap-1.5">
+                                            {[1, 2, 3, 4].map(num => (
+                                                <button key={`amb-${num}`} onClick={() => setFilters(f => ({ ...f, ambientes: f.ambientes === num ? 0 : num }))} className={`w-8 h-8 md:w-9 md:h-9 rounded-lg border flex items-center justify-center transition-all ${filters.ambientes === num ? 'bg-primary text-white border-primary shadow-md' : 'border-stone-dark/10 text-stone-dark/70 hover:border-primary/50 bg-stone-50'} text-xs font-medium`}>{num}+</button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">
+                                            Precio (US$)
+                                        </label>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="flex-1">
+                                                <input
+                                                    type="number"
+                                                    name="minPrice"
+                                                    value={filters.minPrice}
+                                                    onChange={handleFilterChange}
+                                                    placeholder="Mín."
+                                                    className="w-full bg-stone-50 border border-stone-dark/5 rounded-lg px-2 py-2 md:py-1.5 text-xs focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-stone-dark/30"
+                                                />
+                                            </div>
+                                            <span className="text-stone-dark/40 font-medium">-</span>
+                                            <div className="flex-1">
+                                                <input
+                                                    type="number"
+                                                    name="maxPrice"
+                                                    value={filters.maxPrice !== '10000000' && filters.maxPrice !== '0' ? filters.maxPrice : ''}
+                                                    onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value || '10000000' }))}
+                                                    placeholder="Máx."
+                                                    className="w-full bg-stone-50 border border-stone-dark/5 rounded-lg px-2 py-2 md:py-1.5 text-xs focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-stone-dark/30"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -305,7 +348,7 @@ const SearchContent = () => {
                 </div>
             </div>
 
-            <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pb-32 flex-grow w-full">
+            <main className="max-w-[1440px] mx-auto px-6 lg:px-12 pb-32 grow w-full">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-stone-dark/5 pb-8">
                     <div>
                         <h2 className="font-serif text-4xl text-stone-dark leading-tight">Resultados</h2>

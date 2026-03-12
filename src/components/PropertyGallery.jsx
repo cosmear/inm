@@ -36,7 +36,7 @@ const PropertyGallery = ({ media, title }) => {
     return (
         <div className="flex flex-col gap-4">
             {/* Main Carousel Image */}
-            <div className="relative rounded-2xl overflow-hidden shadow-glass border border-white/50 bg-stone-100 aspect-[16/9] md:aspect-[21/9] group">
+            <div className="relative rounded-2xl overflow-hidden shadow-glass border border-white/50 bg-stone-100 aspect-video md:aspect-video group">
                 <img
                     src={safeUrl}
                     alt={isPlan ? "Plano de la propiedad" : `${title} - Imagen ${currentIndex + 1}`}
@@ -114,13 +114,13 @@ const PropertyGallery = ({ media, title }) => {
             {/* Lightbox Modal */}
             {isLightboxOpen && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-dark/95 backdrop-blur-md transition-opacity duration-300"
+                    className="fixed inset-0 z-100 flex items-center justify-center bg-stone-dark/95 backdrop-blur-md transition-opacity duration-300"
                     onClick={() => setIsLightboxOpen(false)}
                 >
                     {/* Close button */}
                     <button
                         onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(false); }}
-                        className="absolute top-4 right-4 z-[110] text-white/70 hover:text-white p-2 transition-colors bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
+                        className="absolute top-4 right-4 z-110 text-white/70 hover:text-white p-2 transition-colors bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
                         aria-label="Cerrar"
                     >
                         <span className="material-symbols-outlined text-4xl">close</span>
@@ -131,14 +131,14 @@ const PropertyGallery = ({ media, title }) => {
                         <>
                             <button
                                 onClick={(e) => { e.stopPropagation(); prevMedia(); }}
-                                className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-[110] text-white/50 hover:text-white p-2 transition-all hover:scale-110 bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
+                                className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-110 text-white/50 hover:text-white p-2 transition-all hover:scale-110 bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
                                 aria-label="Anterior"
                             >
                                 <span className="material-symbols-outlined text-4xl md:text-6xl">chevron_left</span>
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); nextMedia(); }}
-                                className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-[110] text-white/50 hover:text-white p-2 transition-all hover:scale-110 bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
+                                className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-110 text-white/50 hover:text-white p-2 transition-all hover:scale-110 bg-stone-dark/30 rounded-full hover:bg-stone-dark/60"
                                 aria-label="Siguiente"
                             >
                                 <span className="material-symbols-outlined text-4xl md:text-6xl">chevron_right</span>
@@ -158,7 +158,7 @@ const PropertyGallery = ({ media, title }) => {
 
                     {/* Thumbnails Strip inside Lightbox */}
                     {media.length > 1 && (
-                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw] z-[110]">
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw] z-110">
                             <div
                                 className="flex gap-2 overflow-x-auto hide-scrollbar py-2 px-4 bg-stone-dark/50 backdrop-blur-lg rounded-2xl border border-white/10"
                                 onClick={(e) => e.stopPropagation()}

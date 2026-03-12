@@ -8,8 +8,8 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata = {
-    title: "Julia Guillot | Luxury Real Estate",
-    description: "Redefiniendo el Lujo Argentino",
+    title: "Julia Guillot - Inmuebles Boutique",
+    description: "Confianza en raíces",
 };
 
 export default function RootLayout({ children }) {

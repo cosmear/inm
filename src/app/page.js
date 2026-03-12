@@ -20,7 +20,7 @@ export default async function Home() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <main className="flex-grow">
+            <main className="grow">
                 {/* Hero Section */}
                 <section className="h-screen relative flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
@@ -35,7 +35,7 @@ export default async function Home() {
                     <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
                         <span className="text-primary font-bold tracking-[0.2em] text-[10px] uppercase mb-4 block drop-shadow-md">Inmobiliaria Boutique</span>
                         <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-10 leading-[0.9] drop-shadow-2xl">
-                            Redefiniendo el <br /> <i className="font-normal opacity-90">Lujo Argentino</i>
+                            Confianza en raíces
                         </h2>
 
                         {/* Search Bar */}

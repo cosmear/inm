@@ -44,6 +44,15 @@ export default function AdminPropertyForm({
         }));
     };
 
+    // Auto-correct 'age' whenever 'operation' changes to 'Proyecto'
+    useEffect(() => {
+        if (form.operation === 'Proyecto') {
+            if (form.age !== 'En construcción' && form.age !== 'Proyecto en pozo') {
+                setForm(prev => ({ ...prev, age: 'Proyecto en pozo' }));
+            }
+        }
+    }, [form.operation]);
+
     const handleNext = () => {
         if (currentStep < 4) setCurrentStep(currentStep + 1);
     };
@@ -157,7 +166,7 @@ export default function AdminPropertyForm({
                                     <div>
                                         <label className="text-xs font-medium text-stone-dark/60 block mb-3">Tipo de operación</label>
                                         <div className="flex flex-wrap gap-0 border border-stone-dark/20 rounded-xl overflow-hidden w-fit">
-                                            {['Venta', 'Alquiler', 'Temporada'].map(op => (
+                                            {['Venta', 'Alquiler', 'Temporada', 'Proyecto'].map(op => (
                                                 <button
                                                     key={op}
                                                     type="button"
@@ -247,7 +256,17 @@ export default function AdminPropertyForm({
                                     <div className="pt-2">
                                         <h3 className="font-serif text-xl text-stone-dark mb-6">Antigüedad</h3>
                                         <div className="space-y-4 max-w-lg">
-                                            {[{ id: 'a_estrenar', label: 'A estrenar', value: 'A estrenar' }, { id: 'anos_antiguedad', label: 'Años de antigüedad', value: 'Años de antigüedad' }, { id: 'en_construccion', label: 'En construcción', value: 'En construcción' }].map((option) => (
+                                            {(form.operation === 'Proyecto' 
+                                                ? [
+                                                    { id: 'en_construccion', label: 'En construcción', value: 'En construcción' },
+                                                    { id: 'en_pozo', label: 'Proyecto en pozo', value: 'Proyecto en pozo' }
+                                                ] 
+                                                : [
+                                                    { id: 'a_estrenar', label: 'A estrenar', value: 'A estrenar' },
+                                                    { id: 'anos_antiguedad', label: 'Años de antigüedad', value: 'Años de antigüedad' },
+                                                    { id: 'en_construccion', label: 'En construcción', value: 'En construcción' }
+                                                ]
+                                            ).map((option) => (
                                                 <div key={option.id} className="flex items-center gap-4">
                                                     <label className="flex items-center gap-3 cursor-pointer text-sm text-stone-dark group">
                                                         <input type="radio" name="age" value={option.value} checked={form.age === option.value} onChange={handleChange} className="w-5 h-5 accent-[#F06C00] cursor-pointer" />
