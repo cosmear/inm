@@ -20,7 +20,11 @@ const Dashboard = () => {
     const fetchPublications = async () => {
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${apiUrl}/api/publications?limit=1000`);
+            const res = await fetch(`${apiUrl}/api/publications?limit=1000`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (res.ok) {
                 const json = await res.json();
                 setPublications(json.data || json);
@@ -95,7 +99,7 @@ const Dashboard = () => {
                                         {pub.status === 'reserved' && <div className="absolute top-0 right-0 bg-amber-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">R</div>}
                                         {pub.status === 'sold' && <div className="absolute top-0 right-0 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-bl-lg">V</div>}
                                     </div>
-                                    <div className="flex-grow">
+                                    <div className="grow">
                                         <div className="flex items-center gap-2 mb-1.5">
                                             <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-primary/5 text-primary rounded border border-primary/10">{pub.operation}</span>
                                             <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-stone-dark/5 text-stone-dark/60 rounded border border-stone-dark/10">{pub.type}</span>
