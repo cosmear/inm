@@ -4,51 +4,13 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
-    throw new Error("Falta la variable de entorno JWT_SECRET");
-}
 
-// Helper for Auth extraction
-function verifyToken(req) {
-    let token = null;
-
-    // Try standard Authorization header
-    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-        token = authHeader.substring(7);
-    }
-
-    // Try custom header
-    if (!token) {
-        token = req.headers.get('x-access-token');
-    }
-
-    // Try URL query parameter
-    if (!token) {
-        try {
-            const url = new URL(req.url);
-            token = url.searchParams.get('token');
-        } catch (e) {
-            // Ignore URL parsing errors
-        }
-    }
-
-    if (!token) {
-        return { error: "Missing token in headers and query" };
-    }
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        return { decoded };
-    } catch (err) {
-        return { error: `JWT Verification failed: ${err.message}. Token length: ${token.length}. Secret present: ${!!JWT_SECRET}` };
-    }
-}
+import { verifyAdminToken } from '@/lib/auth';
 
 export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
-        const authResult = verifyToken(request);
+        const authResult = verifyAdminToken(request);
         const isAdmin = !authResult.error;
 
         let query = "SELECT * FROM publications WHERE 1=1";
@@ -161,7 +123,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-    const authResult = verifyToken(request);
+    const authResult = verifyAdminToken(request);
     if (authResult.error) {
         return NextResponse.json({ error: 'Access denied.', details: authResult.error }, { status: 401 });
     }

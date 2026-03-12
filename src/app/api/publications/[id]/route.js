@@ -4,16 +4,7 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
-function verifyToken(req) {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) return null;
-    const token = authHeader.replace('Bearer ', '');
-    try {
-        return jwt.verify(token, JWT_SECRET);
-    } catch (err) {
-        return null;
-    }
-}
+import { verifyAdminToken } from '@/lib/auth';
 
 export async function GET(request, { params }) {
     try {
@@ -33,8 +24,8 @@ export async function GET(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-    const admin = verifyToken(request);
-    if (!admin) {
+    const authResult = verifyAdminToken(request);
+    if (authResult.error) {
         return NextResponse.json({ error: 'Access denied.' }, { status: 401 });
     }
 
@@ -50,8 +41,8 @@ export async function DELETE(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-    const admin = verifyToken(request);
-    if (!admin) {
+    const authResult = verifyAdminToken(request);
+    if (authResult.error) {
         return NextResponse.json({ error: 'Access denied.' }, { status: 401 });
     }
 

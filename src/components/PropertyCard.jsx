@@ -1,5 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
+import { getParsedImages, getSafeImageUrl } from '@/lib/utils';
 
 const PropertyCard = ({ prop }) => {
     return (
@@ -8,19 +8,16 @@ const PropertyCard = ({ prop }) => {
                 <div className="relative overflow-hidden aspect-[4/3]">
                     {(() => {
                         let coverImg = prop.image_url;
-                        try {
-                            if (prop.images) {
-                                const parsed = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
-                                if (Array.isArray(parsed) && parsed.length > 0) {
-                                    coverImg = parsed[0];
-                                }
+                        if (prop.images) {
+                            const parsed = getParsedImages(prop.images);
+                            if (parsed.length > 0) {
+                                coverImg = parsed[0];
                             }
-                        } catch (e) {
-                            console.error('Error parsing images array', e);
                         }
+                        const finalImgUrl = getSafeImageUrl(coverImg);
                         return (
                             <img
-                                src={coverImg?.startsWith('/uploads/') ? coverImg.replace('/uploads/', '/api/uploads/') : coverImg}
+                                src={finalImgUrl}
                                 alt={prop.title}
                                 className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                             />

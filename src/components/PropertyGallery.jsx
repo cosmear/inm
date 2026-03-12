@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { getSafeImageUrl } from '@/lib/utils';
 
 const PropertyGallery = ({ media, title }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -10,8 +11,7 @@ const PropertyGallery = ({ media, title }) => {
     const currentMedia = media[currentIndex];
     const isPlan = typeof currentMedia !== 'string' && currentMedia.type === 'plan';
     const currentUrl = isPlan ? currentMedia.url : currentMedia;
-    const safeUrl = currentUrl?.startsWith('/uploads/') ? currentUrl.replace('/uploads/', '/api/uploads/') : currentUrl;
-
+    const safeUrl = getSafeImageUrl(currentUrl);
 
     const nextMedia = () => {
         setCurrentIndex((prev) => (prev + 1) % media.length);
@@ -78,7 +78,7 @@ const PropertyGallery = ({ media, title }) => {
                     {media.map((item, idx) => {
                         const isItemPlan = typeof item !== 'string' && item.type === 'plan';
                         const itemUrl = isItemPlan ? item.url : item;
-                        const safeItemUrl = itemUrl?.startsWith('/uploads/') ? itemUrl.replace('/uploads/', '/api/uploads/') : itemUrl;
+                        const safeItemUrl = getSafeImageUrl(itemUrl);
 
                         return (
                             <button
@@ -166,7 +166,7 @@ const PropertyGallery = ({ media, title }) => {
                                 {media.map((item, idx) => {
                                     const isItemPlan = typeof item !== 'string' && item.type === 'plan';
                                     const itemUrl = isItemPlan ? item.url : item;
-                                    const safeItemUrl = itemUrl?.startsWith('/uploads/') ? itemUrl.replace('/uploads/', '/api/uploads/') : itemUrl;
+                                    const safeItemUrl = getSafeImageUrl(itemUrl);
 
                                     return (
                                         <button
