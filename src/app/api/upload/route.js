@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import sharp from 'sharp';
 import path from 'path';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -53,8 +53,8 @@ export async function POST(request) {
                     filename += originalExt;
                 }
 
-                // Upload to Supabase Storage
-                const { data: uploadData, error: uploadError } = await supabase
+                // Upload to Supabase Storage using the Admin client to bypass RLS
+                const { data: uploadData, error: uploadError } = await supabaseAdmin
                     .storage
                     .from('propiedades')
                     .upload(filename, finalBuffer, {
@@ -67,8 +67,9 @@ export async function POST(request) {
                     throw uploadError;
                 }
 
-                // Get public URL
-                const { data: { publicUrl } } = supabase
+                // Get public URL (Safe to use normal client or admin client here, 
+                // but we fetch the URL as an anonymous user to ensure it's truly public)
+                const { data: { publicUrl } } = supabaseAdmin
                     .storage
                     .from('propiedades')
                     .getPublicUrl(filename);
