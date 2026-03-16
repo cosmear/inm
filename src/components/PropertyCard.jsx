@@ -5,7 +5,7 @@ const PropertyCard = ({ prop }) => {
     return (
         <Link href={`/propiedad/${prop.id}`} className="block h-full">
             <article className="group cursor-pointer flex flex-col h-full bg-white/60 backdrop-blur-md rounded-2xl overflow-hidden border border-white/60 shadow-sm transition-all duration-500 hover:shadow-glass hover:-translate-y-1">
-                <div className="relative overflow-hidden aspect-[4/3]">
+                <div className="relative overflow-hidden aspect-4/3">
                     {(() => {
                         let coverImg = prop.image_url;
                         if (prop.images) {
@@ -45,7 +45,7 @@ const PropertyCard = ({ prop }) => {
                     )}
                 </div>
 
-                <div className="p-5 flex flex-col flex-grow bg-white/20">
+                <div className="p-5 flex flex-col grow bg-white/20">
                     <div className="flex justify-between items-start mb-1.5">
                         <h3 className="font-serif text-xl md:text-2xl text-stone-dark group-hover:text-primary transition-colors leading-snug line-clamp-2">
                             {prop.title}

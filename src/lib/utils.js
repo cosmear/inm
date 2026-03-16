@@ -15,5 +15,11 @@ export function getSafeImageUrl(url) {
     if (url.startsWith('/')) {
         return url; // Relative path, Next.js handles it locally
     }
+    
+    // Pass-through for cloud storage URLs (Supabase)
+    if (url.startsWith('http')) {
+        return url;
+    }
+
     return url;
 }

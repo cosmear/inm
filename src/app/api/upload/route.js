@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
 import jwt from 'jsonwebtoken';
 import sharp from 'sharp';
+import path from 'path';
+import { supabase } from '@/lib/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -29,50 +29,56 @@ export async function POST(request) {
             return NextResponse.json({ error: 'No files received.' }, { status: 400 });
         }
 
-        const destinationDirPath = path.join(process.cwd(), 'public', 'uploads');
-
-        // Ensure directory exists
-        try {
-            await mkdir(destinationDirPath, { recursive: true });
-        } catch (dirErr) {
-            console.error("Error creating directory:", dirErr);
-        }
-
         const uploadedUrls = [];
 
         // Process all files in parallel
         const uploadPromises = allFilesToProcess.map(async (file) => {
             const buffer = Buffer.from(await file.arrayBuffer());
-            const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.webp`;
-            const relativeUrl = `/api/uploads/${filename}`;
-            const filePath = path.join(destinationDirPath, filename);
+            const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file.name);
+            
+            let finalBuffer = buffer;
+            let filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+            let contentType = file.type;
 
             try {
-                // Determine if file is an image based on mimetype or extension
-                const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif|gif)$/i.test(file.name);
-
                 if (isImage) {
                     // Compress and convert to webp using sharp
-                    await sharp(buffer)
-                        .webp({ quality: 80 }) // 80% quality is a very good balance between size and detail
-                        .toFile(filePath);
+                    finalBuffer = await sharp(buffer)
+                        .webp({ quality: 80 })
+                        .toBuffer();
+                    filename += '.webp';
+                    contentType = 'image/webp';
                 } else {
-                    // For non-images (like PDFs, plans), just write it as standard, keeping original extension
                     const originalExt = path.extname(file.name);
-                    const docFilename = `${Date.now()}-${Math.round(Math.random() * 1E9)}${originalExt}`;
-                    const docFilePath = path.join(destinationDirPath, docFilename);
-                    const docRelativeUrl = `/api/uploads/${docFilename}`;
-
-                    await writeFile(docFilePath, buffer);
-                    return docRelativeUrl;
+                    filename += originalExt;
                 }
-            } catch (err) {
-                console.error("Error processing file:", file.name, err);
-                // Fallback to direct write if sharp fails (e.g. damaged image)
-                await writeFile(filePath, buffer);
-            }
 
-            return relativeUrl;
+                // Upload to Supabase Storage
+                const { data: uploadData, error: uploadError } = await supabase
+                    .storage
+                    .from('propiedades')
+                    .upload(filename, finalBuffer, {
+                        contentType: contentType,
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (uploadError) {
+                    throw uploadError;
+                }
+
+                // Get public URL
+                const { data: { publicUrl } } = supabase
+                    .storage
+                    .from('propiedades')
+                    .getPublicUrl(filename);
+
+                return publicUrl;
+                
+            } catch (err) {
+                console.error("Error processing/uploading file:", file.name, err);
+                throw err;
+            }
         });
 
         const urls = await Promise.all(uploadPromises);
