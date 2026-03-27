@@ -5,9 +5,26 @@ import { useAuth } from '@/components/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+async function fetchPublicationsData(token) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const res = await fetch(`${apiUrl}/api/publications?limit=1000`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error('Error fetching publications');
+    }
+
+    const json = await res.json();
+    return json.data || json;
+}
+
 const Dashboard = () => {
     const [publications, setPublications] = useState([]);
-    const { token, logout } = useAuth();
+    const [downloadingQrId, setDownloadingQrId] = useState(null);
+    const { token } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -17,38 +34,85 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [token, router]);
 
-    const fetchPublications = async () => {
-        try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
-            const res = await fetch(`${apiUrl}/api/publications?limit=1000`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (res.ok) {
-                const json = await res.json();
-                setPublications(json.data || json);
+    useEffect(() => {
+        if (!token) return;
+
+        const loadPublications = async () => {
+            try {
+                const publicationsData = await fetchPublicationsData(token);
+                setPublications(publicationsData);
+            } catch (err) {
+                console.error('Error fetching publications:', err);
             }
-        } catch (err) {
-            console.error('Error fetching publications:', err);
+        };
+
+        loadPublications();
+    }, [token]);
+
+    const getPublicPropertyUrl = (id) => {
+        const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '');
+        const fallbackBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+        const baseUrl = configuredBaseUrl || fallbackBaseUrl;
+
+        return `${baseUrl}/propiedad/${id}`;
+    };
+
+    const getQrFilename = (title) => {
+        const sanitizedTitle = (title || 'propiedad')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
+        return `qr-${sanitizedTitle || 'propiedad'}.png`;
+    };
+
+    const handleDownloadQr = async (publication) => {
+        setDownloadingQrId(publication.id);
+
+        try {
+            const QRCode = (await import('qrcode')).default;
+            const qrDataUrl = await QRCode.toDataURL(getPublicPropertyUrl(publication.id), {
+                width: 1024,
+                margin: 2,
+                errorCorrectionLevel: 'H',
+                color: {
+                    dark: '#1c1917',
+                    light: '#ffffff',
+                },
+            });
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = qrDataUrl;
+            downloadLink.download = getQrFilename(publication.title);
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            downloadLink.remove();
+        } catch (error) {
+            console.error('Error generating QR:', error);
+            alert('No se pudo descargar el QR. Intenta nuevamente.');
+        } finally {
+            setDownloadingQrId(null);
         }
     };
 
-    useEffect(() => {
-        if (token) fetchPublications();
-    }, [token]);
-
-
-
     const handleDelete = async (id) => {
-        if (!window.confirm('¿Seguro que quieres eliminar esta publicación de forma permanente?')) return;
+        if (!window.confirm('\u00BFSeguro que quieres eliminar esta publicaci\u00F3n de forma permanente?')) return;
+
         try {
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
             const res = await fetch(`${apiUrl}/api/publications/${id}`, {
-                method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
             });
-            if (res.ok) fetchPublications();
-            else alert('Error al eliminar. Intenta nuevamente.');
+
+            if (res.ok) {
+                const publicationsData = await fetchPublicationsData(token);
+                setPublications(publicationsData);
+            } else {
+                alert('Error al eliminar. Intenta nuevamente.');
+            }
         } catch (err) {
             alert('Error al eliminar. Intenta nuevamente.');
         }
@@ -64,8 +128,8 @@ const Dashboard = () => {
                         <div className="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-6">
                             <span className="material-symbols-outlined text-3xl">add_home</span>
                         </div>
-                        <h2 className="font-serif text-2xl text-stone-dark mb-3">¿Nueva propiedad?</h2>
-                        <p className="text-stone-dark/60 text-sm mb-8 px-4">Utiliza nuestro nuevo asistente paso a paso para publicarla fácilmente.</p>
+                        <h2 className="font-serif text-2xl text-stone-dark mb-3">&iquest;Nueva propiedad?</h2>
+                        <p className="text-stone-dark/60 text-sm mb-8 px-4">Utiliza nuestro nuevo asistente paso a paso para publicarla f&aacute;cilmente.</p>
                         <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg transition-all text-center block mb-4">
                             Crear Nueva Propiedad
                         </Link>
@@ -76,7 +140,7 @@ const Dashboard = () => {
                             <span className="material-symbols-outlined text-2xl">contact_mail</span>
                         </div>
                         <h3 className="font-serif text-xl text-stone-dark mb-2">Mensajes de Clientes</h3>
-                        <p className="text-stone-dark/60 text-xs mb-6 px-2">Revisa las consultas que te envían desde la web.</p>
+                        <p className="text-stone-dark/60 text-xs mb-6 px-2">Revisa las consultas que te env&iacute;an desde la web.</p>
                         <Link href="/admin/leads" className="w-full bg-stone-100 hover:bg-stone-200 text-stone-dark font-medium py-3 rounded-xl uppercase tracking-wider text-[11px] transition-all text-center block border border-stone-200">
                             Ver Panel de Consultas
                         </Link>
@@ -90,7 +154,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 gap-6">
-                        {publications.map(pub => (
+                        {publications.map((pub) => (
                             <div key={pub.id} className="glass-card p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 group hover:border-primary/30 transition-all">
                                 <div className="flex items-center gap-6 w-full">
                                     <div className="size-20 rounded-xl overflow-hidden shrink-0 shadow-sm relative">
@@ -108,10 +172,20 @@ const Dashboard = () => {
                                             {pub.status === 'sold' && <span className="text-[9px] font-medium uppercase tracking-wider px-2 py-0.5 bg-red-100 text-red-700 rounded">Vendida</span>}
                                         </div>
                                         <h4 className="font-serif text-xl text-stone-dark line-clamp-1">{pub.title}</h4>
-                                        <p className="text-stone-dark/60 text-xs font-medium tracking-wide mt-1">{pub.location} <span className="mx-1">•</span> ${pub.price?.toLocaleString()}</p>
+                                        <p className="text-stone-dark/60 text-xs font-medium tracking-wide mt-1">{pub.location} <span className="mx-1">&bull;</span> ${pub.price?.toLocaleString()}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        onClick={() => handleDownloadQr(pub)}
+                                        className="size-10 rounded-xl bg-amber-50/70 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-100 transition-all flex items-center justify-center group/btn disabled:opacity-60 disabled:cursor-wait"
+                                        title="Descargar QR"
+                                        disabled={downloadingQrId === pub.id}
+                                    >
+                                        <span className="material-symbols-outlined text-lg group-hover/btn:scale-110 transition-transform">
+                                            {downloadingQrId === pub.id ? 'progress_activity' : 'qr_code_2'}
+                                        </span>
+                                    </button>
                                     <Link href={`/admin/editar-propiedad/${pub.id}`} className="size-10 rounded-xl bg-blue-50/50 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-100 transition-all flex items-center justify-center group/btn" title="Editar">
                                         <span className="material-symbols-outlined text-lg group-hover/btn:-rotate-12 transition-transform">edit</span>
                                     </Link>
