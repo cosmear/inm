@@ -33,8 +33,10 @@ export default async function Home() {
                     </div>
 
                     <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
-                        <span className="text-primary font-bold tracking-[0.2em] text-[10px] uppercase mb-4 block drop-shadow-md">Inmobiliaria Boutique</span>
-                        <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-10 leading-[0.9] drop-shadow-2xl">
+                        <span className="text-primary font-bold tracking-widest text-3xl md:text-4xl uppercase mb-4 block drop-shadow-md">
+                            Julia Guillot - (aquí iría el número de matrícula)
+                        </span>
+                        <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mb-10 leading-tight drop-shadow-2xl">
                             Confianza en raíces
                         </h2>
 
@@ -62,10 +64,10 @@ export default async function Home() {
                 <section className="py-32 bg-cream">
                     <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
                         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
-                            <div className="max-w-xl">
-                                <span className="text-primary font-bold tracking-widest text-xs uppercase mb-4 block">Listados Curados</span>
-                                <h3 className="font-serif text-4xl md:text-6xl text-stone-dark leading-tight">
-                                    Lo mejor del mercado en un solo lugar
+                            <div className="md:max-w-3xl lg:max-w-4xl">
+                                <span className="text-primary font-bold tracking-widest text-xs uppercase mb-4 block">Últimas propiedades</span>
+                                <h3 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-dark leading-tight">
+                                    Propiedades y oportunidades para cada proyecto de vida
                                 </h3>
                             </div>
                             <Link href="/search" className="group flex items-center gap-4 text-stone-dark font-bold uppercase tracking-widest text-[10px]">

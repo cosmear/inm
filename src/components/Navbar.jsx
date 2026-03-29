@@ -3,12 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from './AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const Navbar = () => {
     const { token, logout } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
     const [activeOperations, setActiveOperations] = useState([]);
+
+    const handleHomeClick = (e) => {
+        if (pathname === '/') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
 
     useEffect(() => {
         const fetchOperations = async () => {
@@ -33,9 +41,9 @@ const Navbar = () => {
     return (
         <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-cream/80 backdrop-blur-md border-b border-primary/10">
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-3 text-primary-dark group">
-                    <div className="size-8 bg-primary rounded-xl flex items-center justify-center text-white transition-transform group-hover:rotate-12">
-                        <span className="material-symbols-outlined text-[20px]!">villa</span>
+                <Link href="/" onClick={handleHomeClick} className="flex items-center gap-3 text-primary-dark group">
+                    <div className="size-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:rotate-12 shadow-sm p-1.5 overflow-hidden border border-stone-200/50">
+                        <img src="/GuillotJuliaLogo.webp" alt="Logo Julia Guillot" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="font-serif text-2xl font-medium tracking-tight">Julia Guillot</h1>
                 </Link>

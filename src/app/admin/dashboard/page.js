@@ -123,25 +123,25 @@ const Dashboard = () => {
     return (
         <div className="bg-cream min-h-screen font-display flex flex-col">
             <main className="max-w-[1440px] mx-auto px-6 lg:px-12 py-32 w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
-                <aside className="lg:col-span-12 xl:col-span-4">
-                    <div className="sticky top-32 glass-card p-10 rounded-3xl shadow-glass border border-white/60 text-center flex flex-col items-center justify-center min-h-[300px]">
-                        <div className="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-6">
-                            <span className="material-symbols-outlined text-3xl">add_home</span>
+                <aside className="lg:col-span-12 xl:col-span-4 h-full">
+                    <div className="sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-hide glass-card p-6 lg:p-8 rounded-3xl shadow-glass border border-white/60 text-center flex flex-col items-center justify-center">
+                        <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 shrink-0">
+                            <span className="material-symbols-outlined text-2xl">add_home</span>
                         </div>
-                        <h2 className="font-serif text-2xl text-stone-dark mb-3">&iquest;Nueva propiedad?</h2>
-                        <p className="text-stone-dark/60 text-sm mb-8 px-4">Utiliza nuestro nuevo asistente paso a paso para publicarla f&aacute;cilmente.</p>
-                        <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-4 rounded-xl uppercase tracking-wider text-xs shadow-lg transition-all text-center block mb-4">
+                        <h2 className="font-serif text-xl lg:text-2xl text-stone-dark mb-2">&iquest;Nueva propiedad?</h2>
+                        <p className="text-stone-dark/60 text-xs lg:text-sm mb-6 px-2">Utiliza nuestro nuevo asistente paso a paso para publicarla f&aacute;cilmente.</p>
+                        <Link href="/admin/nueva-propiedad" className="w-full bg-[#F06C00] hover:bg-[#D96100] text-white font-medium py-3 rounded-xl uppercase tracking-wider text-[11px] lg:text-xs shadow-lg transition-all text-center block shrink-0">
                             Crear Nueva Propiedad
                         </Link>
 
-                        <div className="w-full h-px bg-stone-dark/10 my-4"></div>
+                        <div className="w-full h-px bg-stone-dark/10 my-6 shrink-0"></div>
 
-                        <div className="size-12 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center mb-4 mt-2">
-                            <span className="material-symbols-outlined text-2xl">contact_mail</span>
+                        <div className="size-10 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center mb-3 shrink-0">
+                            <span className="material-symbols-outlined text-xl">contact_mail</span>
                         </div>
-                        <h3 className="font-serif text-xl text-stone-dark mb-2">Mensajes de Clientes</h3>
-                        <p className="text-stone-dark/60 text-xs mb-6 px-2">Revisa las consultas que te env&iacute;an desde la web.</p>
-                        <Link href="/admin/leads" className="w-full bg-stone-100 hover:bg-stone-200 text-stone-dark font-medium py-3 rounded-xl uppercase tracking-wider text-[11px] transition-all text-center block border border-stone-200">
+                        <h3 className="font-serif text-lg lg:text-xl text-stone-dark mb-1">Mensajes de Clientes</h3>
+                        <p className="text-stone-dark/60 text-[10px] lg:text-xs mb-5 px-2">Revisa las consultas que te env&iacute;an desde la web.</p>
+                        <Link href="/admin/leads" className="w-full bg-stone-100 hover:bg-stone-200 text-stone-dark font-medium py-3 rounded-xl uppercase tracking-wider text-[10px] lg:text-[11px] transition-all text-center block border border-stone-200 shrink-0">
                             Ver Panel de Consultas
                         </Link>
                     </div>
