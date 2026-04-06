@@ -9,44 +9,25 @@
 
 <url>
   <loc>https://juliaguillot.com/</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
+  <lastmod>2026-04-06T22:11:18+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://juliaguillot.com/admin/login</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
   <loc>https://juliaguillot.com/search?operation=Venta</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
+  <lastmod>2026-04-06T22:11:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://juliaguillot.com/search?operation=Alquiler</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
+  <lastmod>2026-04-06T22:11:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://juliaguillot.com/search</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
+  <lastmod>2026-04-06T22:11:18+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-<url>
-  <loc>https://juliaguillot.com/propiedad/23</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://juliaguillot.com/propiedad/22</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://juliaguillot.com/propiedad/21</loc>
-  <lastmod>2026-04-06T21:36:51+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
+
 
 
 </urlset>
