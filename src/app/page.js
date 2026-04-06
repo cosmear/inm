@@ -34,7 +34,7 @@ export default async function Home() {
 
                     <div className="relative z-10 text-center px-6 w-full max-w-4xl mx-auto">
                         <span className="text-primary font-bold tracking-widest text-2xl md:text-3xl uppercase mb-4 block drop-shadow-md">
-                            Julia Guillot - Mat. 276154
+                            Julia Guillot - C.S.M N°2420
                         </span>
                         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mb-10 leading-tight drop-shadow-2xl">
                             Confianza en raíces

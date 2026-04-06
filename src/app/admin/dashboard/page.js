@@ -23,7 +23,6 @@ async function fetchPublicationsData(token) {
 
 const Dashboard = () => {
     const [publications, setPublications] = useState([]);
-    const [downloadingQrId, setDownloadingQrId] = useState(null);
     const { token } = useAuth();
     const router = useRouter();
 
@@ -48,54 +47,6 @@ const Dashboard = () => {
 
         loadPublications();
     }, [token]);
-
-    const getPublicPropertyUrl = (id) => {
-        const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '');
-        const fallbackBaseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-        const baseUrl = configuredBaseUrl || fallbackBaseUrl;
-
-        return `${baseUrl}/propiedad/${id}`;
-    };
-
-    const getQrFilename = (title) => {
-        const sanitizedTitle = (title || 'propiedad')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-
-        return `qr-${sanitizedTitle || 'propiedad'}.png`;
-    };
-
-    const handleDownloadQr = async (publication) => {
-        setDownloadingQrId(publication.id);
-
-        try {
-            const QRCode = (await import('qrcode')).default;
-            const qrDataUrl = await QRCode.toDataURL(getPublicPropertyUrl(publication.id), {
-                width: 1024,
-                margin: 2,
-                errorCorrectionLevel: 'H',
-                color: {
-                    dark: '#1c1917',
-                    light: '#ffffff',
-                },
-            });
-
-            const downloadLink = document.createElement('a');
-            downloadLink.href = qrDataUrl;
-            downloadLink.download = getQrFilename(publication.title);
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-        } catch (error) {
-            console.error('Error generating QR:', error);
-            alert('No se pudo descargar el QR. Intenta nuevamente.');
-        } finally {
-            setDownloadingQrId(null);
-        }
-    };
 
     const handleDelete = async (id) => {
         if (!window.confirm('\u00BFSeguro que quieres eliminar esta publicaci\u00F3n de forma permanente?')) return;
@@ -176,16 +127,6 @@ const Dashboard = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 shrink-0">
-                                    <button
-                                        onClick={() => handleDownloadQr(pub)}
-                                        className="size-10 rounded-xl bg-amber-50/70 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-100 transition-all flex items-center justify-center group/btn disabled:opacity-60 disabled:cursor-wait"
-                                        title="Descargar QR"
-                                        disabled={downloadingQrId === pub.id}
-                                    >
-                                        <span className="material-symbols-outlined text-lg group-hover/btn:scale-110 transition-transform">
-                                            {downloadingQrId === pub.id ? 'progress_activity' : 'qr_code_2'}
-                                        </span>
-                                    </button>
                                     <Link href={`/admin/editar-propiedad/${pub.id}`} className="size-10 rounded-xl bg-blue-50/50 text-blue-500 hover:bg-blue-500 hover:text-white border border-blue-100 transition-all flex items-center justify-center group/btn" title="Editar">
                                         <span className="material-symbols-outlined text-lg group-hover/btn:-rotate-12 transition-transform">edit</span>
                                     </Link>
