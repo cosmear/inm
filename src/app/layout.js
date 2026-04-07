@@ -76,7 +76,7 @@ export default function RootLayout({ children }) {
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
                 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
             </head>
-            <body className="bg-cream text-stone-dark font-display min-h-screen flex flex-col antialiased pt-20 md:pt-0">
+            <body className="bg-cream text-stone-dark font-display min-h-screen flex flex-col antialiased">
                 <AuthProvider>
                     <Navbar />
                     {children}

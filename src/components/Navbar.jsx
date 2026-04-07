@@ -50,6 +50,9 @@ const Navbar = () => {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6 md:gap-10">
+                    <Link href="/" onClick={handleHomeClick} className="text-xs font-semibold text-stone-dark hover:text-primary uppercase tracking-wider transition-colors">
+                        Inicio
+                    </Link>
                     {/* Render standard operations dynamically */}
                     {['Venta', 'Alquiler', 'Temporada'].map(op => {
                         if (activeOperations.includes(op)) {
@@ -102,7 +105,14 @@ const Navbar = () => {
 
             {/* Mobile Menu Dropdown */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-20 right-0 w-full bg-cream/95 backdrop-blur-xl border-b border-primary/10 shadow-lg px-6 py-6 flex flex-col gap-5">
+                <div className="md:hidden absolute top-20 right-0 w-full bg-cream/95 backdrop-blur-xl border-b border-primary/10 shadow-lg px-6 py-6 flex flex-col gap-5 text-center">
+                    <Link 
+                        href="/" 
+                        onClick={(e) => { setIsMobileMenuOpen(false); handleHomeClick(e); }}
+                        className="text-[13px] font-bold text-stone-dark hover:text-primary uppercase tracking-widest transition-colors border-b border-stone-dark/5 pb-3 block"
+                    >
+                        Inicio
+                    </Link>
                     {['Venta', 'Alquiler', 'Temporada'].map(op => {
                         if (activeOperations.includes(op)) {
                             return (

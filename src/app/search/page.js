@@ -215,7 +215,7 @@ const SearchContent = () => {
                         </div>
 
                         {/* Quick Search Inputs */}
-                        <div className="grow flex gap-4 w-full md:w-auto">
+                        <div className="grow hidden md:flex gap-4 w-full md:w-auto">
                             <select
                                 name="provincia"
                                 value={filters.provincia}
@@ -241,7 +241,7 @@ const SearchContent = () => {
                         {/* Toggle Advanced Filters */}
                         <button
                             onClick={() => setShowAdvanced(!showAdvanced)}
-                            className={`shrink-0 flex items-center gap-2 px-5 py-3 rounded-xl border transition-all ${showAdvanced || filters.type || filters.bedrooms > 0 || filters.ambientes > 0 || filters.maxPrice !== '10000000'
+                            className={`shrink-0 flex w-full md:w-auto justify-center md:justify-start items-center gap-2 px-5 py-3 rounded-xl border transition-all ${showAdvanced || filters.type || filters.bedrooms > 0 || filters.ambientes > 0 || filters.maxPrice !== '10000000'
                                 ? 'bg-primary/10 border-primary/20 text-primary font-bold'
                                 : 'bg-transparent border-stone-dark/10 text-stone-dark/70 hover:bg-stone-50 font-medium'
                                 } text-sm`}
@@ -255,6 +255,33 @@ const SearchContent = () => {
                     <div className={`grid transition-all duration-500 ease-in-out ${showAdvanced ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'}`}>
                         <div className="overflow-hidden">
                             <div className="bg-white rounded-2xl p-6 border border-stone-dark/5 shadow-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                                {/* Quick Search Inputs (Mobile Only inside Advanced Panel) */}
+                                <div className="md:hidden space-y-6 col-span-1">
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Provincia</label>
+                                        <select
+                                            name="provincia"
+                                            value={filters.provincia}
+                                            onChange={handleFilterChange}
+                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium text-sm appearance-none cursor-pointer"
+                                        >
+                                            <option value="" className="text-stone-dark/50">Provincia (Todas)</option>
+                                            {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Ciudad o Barrio</label>
+                                        <input
+                                            type="text"
+                                            name="ciudad"
+                                            value={filters.ciudad}
+                                            onChange={handleFilterChange}
+                                            placeholder="Ciudad o Barrio..."
+                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium text-sm"
+                                        />
+                                    </div>
+                                </div>
 
                                 <div>
                                     <label className="text-[10px] font-bold uppercase tracking-wider text-stone-dark/60 block mb-3">Tipo de Inmueble</label>
