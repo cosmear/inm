@@ -107,15 +107,15 @@ export default function AdminPropertyForm({
         <div className="bg-cream min-h-screen font-display flex flex-col pt-16">
             {/* Top Navigation Progress */}
             <div className="bg-white border-b border-stone-dark/10 sticky top-[72px] z-10 w-full pt-4">
-                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between relative">
-                    <div className="absolute top-1/2 left-6 right-6 h-0.5 bg-stone-dark/10 -z-10 -translate-y-1/2 rounded-full"></div>
+                <div className="max-w-5xl mx-auto px-2 md:px-6 py-4 flex items-center justify-between relative overflow-hidden">
+                    <div className="absolute top-1/2 left-4 right-4 md:left-6 md:right-6 h-0.5 bg-stone-dark/10 pointer-events-none -translate-y-1/2 rounded-full z-0"></div>
                     <div
-                        className="absolute top-1/2 left-6 h-0.5 bg-primary -z-10 -translate-y-1/2 transition-all duration-300 rounded-full"
-                        style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                        className="absolute top-1/2 left-4 md:left-6 h-0.5 bg-primary pointer-events-none -translate-y-1/2 transition-all duration-300 rounded-full z-0"
+                        style={{ width: `calc(${((currentStep - 1) / 3) * 100}% - 32px)` }}
                     ></div>
 
                     {steps.map((step) => (
-                        <div key={step.id} className="flex flex-col items-center gap-2 bg-white px-2">
+                        <div key={step.id} className="flex flex-col items-center gap-1 md:gap-2 bg-white px-2 md:px-4 z-10 shrink-0">
                             <div className={`size-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${currentStep >= step.id ? 'bg-primary text-white' : 'bg-stone-dark/10 text-stone-dark/40'}`}>
                                 {currentStep > step.id ? '✓' : step.id}
                             </div>
@@ -165,13 +165,13 @@ export default function AdminPropertyForm({
 
                                     <div>
                                         <label className="text-xs font-medium text-stone-dark/60 block mb-3">Tipo de operación</label>
-                                        <div className="flex flex-wrap gap-0 border border-stone-dark/20 rounded-xl overflow-hidden w-fit">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-stone-dark/20 border border-stone-dark/20 rounded-xl overflow-hidden w-full md:w-fit">
                                             {['Venta', 'Alquiler', 'Temporada', 'Proyecto'].map(op => (
                                                 <button
                                                     key={op}
                                                     type="button"
                                                     onClick={() => setForm({ ...form, operation: op })}
-                                                    className={`px-6 py-2.5 text-sm font-medium border-r border-stone-dark/20 last:border-r-0 transition-colors ${form.operation === op ? 'text-primary bg-primary/5' : 'text-stone-dark/70 hover:bg-stone-50'}`}
+                                                    className={`w-full px-4 py-3 md:py-2.5 text-sm font-medium transition-colors ${form.operation === op ? 'text-primary bg-orange-50' : 'text-stone-dark/70 bg-white hover:bg-stone-50'}`}
                                                 >
                                                     {op}
                                                 </button>
@@ -338,27 +338,28 @@ export default function AdminPropertyForm({
                                                             <img src={img instanceof File ? URL.createObjectURL(img) : img} alt={`Img ${idx + 1}`} className="w-full h-full object-cover" />
 
                                                             {/* Controls Overlay */}
-                                                            <div className="absolute inset-x-0 top-0 p-1 flex justify-between opacity-0 group-hover:opacity-100 transition-opacity bg-linear-to-b from-black/50 to-transparent">
-                                                                <div className="flex gap-1">
-                                                                    {idx > 0 && (
-                                                                        <button type="button" onClick={() => moveImage(idx, -1)} className="bg-white/90 text-stone-dark p-1 rounded hover:bg-white shadow-sm" title="Mover a la izquierda">
-                                                                            <span className="material-symbols-outlined text-[14px]">chevron_left</span>
-                                                                        </button>
-                                                                    )}
-                                                                    {idx < form.images.length - 1 && (
-                                                                        <button type="button" onClick={() => moveImage(idx, 1)} className="bg-white/90 text-stone-dark p-1 rounded hover:bg-white shadow-sm" title="Mover a la derecha">
-                                                                            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => removeImage(idx)}
-                                                                    className="bg-red-500 text-white p-1 rounded hover:bg-red-600 shadow-sm"
-                                                                    title="Eliminar imagen"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-[14px]">close</span>
-                                                                </button>
+                                                            <div className="absolute inset-0 bg-transparent group-hover:bg-black/20 transition-colors pointer-events-none"></div>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeImage(idx)}
+                                                                className="absolute top-1.5 right-1.5 bg-white/90 hover:bg-red-500 hover:text-white text-stone-dark rounded-full size-6 flex items-center justify-center shadow-md transition-all opacity-90 md:opacity-0 md:group-hover:opacity-100 z-10"
+                                                                title="Eliminar imagen"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[14px]">close</span>
+                                                            </button>
+
+                                                            <div className="absolute bottom-1.5 inset-x-0 flex justify-center gap-2 opacity-90 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 px-1">
+                                                                {idx > 0 && (
+                                                                    <button type="button" onClick={() => moveImage(idx, -1)} className="bg-white/90 hover:bg-white text-stone-dark size-7 rounded-md flex items-center justify-center shadow-md transition-colors" title="Mover a la izquierda">
+                                                                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                                                                    </button>
+                                                                )}
+                                                                {idx < form.images.length - 1 && (
+                                                                    <button type="button" onClick={() => moveImage(idx, 1)} className="bg-white/90 hover:bg-white text-stone-dark size-7 rounded-md flex items-center justify-center shadow-md transition-colors" title="Mover a la derecha">
+                                                                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                                                                    </button>
+                                                                )}
                                                             </div>
 
                                                             {idx === 0 && (
@@ -475,20 +476,20 @@ export default function AdminPropertyForm({
                         </div>
 
                         {/* Bottom Action Bar */}
-                        <div className="mt-10 pt-6 border-t border-stone-dark/10 flex items-center justify-between">
+                        <div className="mt-10 pt-6 pb-20 md:pb-0 border-t border-stone-dark/10 flex flex-col-reverse md:flex-row items-center justify-between gap-4">
                             {currentStep > 1 ? (
-                                <button type="button" onClick={handleBack} className="text-sm font-medium text-stone-dark/70 hover:text-primary flex items-center gap-1 transition-colors">
+                                <button type="button" onClick={handleBack} className="text-sm font-medium text-stone-dark/70 hover:text-primary flex items-center gap-1 transition-colors w-full justify-center md:justify-start md:w-auto">
                                     <span className="material-symbols-outlined text-lg">chevron_left</span> Atrás
                                 </button>
-                            ) : <div></div>}
+                            ) : <div className="hidden md:block"></div>}
 
-                            <div className="flex items-center gap-4">
-                                <Link href="/admin/dashboard" className="px-6 py-2.5 rounded-xl border border-stone-dark/20 text-stone-dark text-sm font-medium hover:bg-stone-50 transition-colors">
+                            <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+                                <Link href="/admin/dashboard" className="px-6 py-2.5 rounded-xl border border-stone-dark/20 text-stone-dark text-sm font-medium hover:bg-stone-50 transition-colors w-full text-center md:w-auto">
                                     {isEditing ? 'Cancelar' : 'Guardar y salir'}
                                 </Link>
 
                                 {currentStep < 4 ? (
-                                    <button type="button" onClick={handleNext} disabled={currentStep === 1 && !form.type} className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm transition-colors">
+                                    <button type="button" onClick={handleNext} disabled={currentStep === 1 && !form.type} className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm transition-colors w-full md:w-auto">
                                         Continuar
                                     </button>
                                 ) : (
@@ -496,7 +497,7 @@ export default function AdminPropertyForm({
                                         type="button" 
                                         onClick={handleSubmitClick} 
                                         disabled={loading || !form.title || !form.price || !form.description || form.images.length === 0} 
-                                        className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm flex items-center gap-2 transition-colors"
+                                        className="px-8 py-2.5 rounded-xl bg-[#F06C00] hover:bg-[#D96100] disabled:opacity-50 text-white text-sm font-medium shadow-sm flex items-center justify-center gap-2 transition-colors w-full md:w-auto"
                                     >
                                         {loading ? (isEditing ? 'Guardando...' : 'Publicando...') : (isEditing ? 'Guardar Cambios' : 'Publicar Aviso')}
                                     </button>

@@ -75,7 +75,8 @@ const Dashboard = () => {
         <div className="bg-cream min-h-screen font-display flex flex-col">
             <main className="max-w-[1440px] mx-auto px-6 lg:px-12 py-32 w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <aside className="lg:col-span-12 xl:col-span-4 h-full">
-                    <div className="sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-hide glass-card p-6 lg:p-8 rounded-3xl shadow-glass border border-white/60 text-center flex flex-col items-center justify-center">
+                    {/* Desktop/Tablet Card */}
+                    <div className="hidden md:flex flex-col items-center justify-center sticky top-28 max-h-[calc(100vh-140px)] overflow-y-auto scrollbar-hide glass-card p-6 lg:p-8 rounded-3xl shadow-glass border border-white/60 text-center">
                         <div className="size-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4 shrink-0">
                             <span className="material-symbols-outlined text-2xl">add_home</span>
                         </div>
@@ -94,6 +95,18 @@ const Dashboard = () => {
                         <p className="text-stone-dark/60 text-[10px] lg:text-xs mb-5 px-2">Revisa las consultas que te env&iacute;an desde la web.</p>
                         <Link href="/admin/leads" className="w-full bg-stone-100 hover:bg-stone-200 text-stone-dark font-medium py-3 rounded-xl uppercase tracking-wider text-[10px] lg:text-[11px] transition-all text-center block border border-stone-200 shrink-0">
                             Ver Panel de Consultas
+                        </Link>
+                    </div>
+
+                    {/* Mobile Floating Actions */}
+                    <div className="md:hidden flex gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-md border border-stone-dark/10 sticky top-[88px] z-30">
+                        <Link href="/admin/nueva-propiedad" className="flex-1 bg-[#F06C00] active:bg-[#D96100] text-white flex flex-col items-center justify-center gap-1 py-3 rounded-xl shadow-sm transition-colors">
+                            <span className="material-symbols-outlined text-xl">add_home</span>
+                            <span className="font-bold text-[10px] uppercase tracking-wider">Crear</span>
+                        </Link>
+                        <Link href="/admin/leads" className="flex-1 bg-stone-100 active:bg-stone-200 text-stone-dark border border-stone-dark/10 flex flex-col items-center justify-center gap-1 py-3 rounded-xl shadow-sm transition-colors">
+                            <span className="material-symbols-outlined text-xl text-blue-500">mail</span>
+                            <span className="font-bold text-[10px] uppercase tracking-wider">Mensajes</span>
                         </Link>
                     </div>
                 </aside>
