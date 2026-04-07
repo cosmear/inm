@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import jwt from 'jsonwebtoken';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+
+const extractFilenamesFromUrls = (urls) => {
+    return urls
+        .filter(url => url && typeof url === 'string' && url.includes('/storage/v1/object/public/propiedades/'))
+        .map(url => {
+            const parts = url.split('/');
+            return decodeURIComponent(parts[parts.length - 1]);
+        });
+};
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
 
@@ -33,6 +43,26 @@ export async function DELETE(request, { params }) {
         const id = (await params).id;
         if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
+        // Retrieve existing files to delete from bucket
+        const [rows] = await pool.query(`SELECT images, plan_url FROM publications WHERE id = ?`, [id]);
+        if (rows.length > 0) {
+            const prop = rows[0];
+            let allUrls = [];
+            try {
+                if (prop.images) {
+                    const parsed = typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images;
+                    if (Array.isArray(parsed)) allUrls.push(...parsed);
+                }
+            } catch (e) {}
+            if (prop.plan_url) allUrls.push(prop.plan_url);
+            
+            const filesToDelete = extractFilenamesFromUrls(allUrls);
+            if (filesToDelete.length > 0) {
+                const { error } = await supabaseAdmin.storage.from('propiedades').remove(filesToDelete);
+                if (error) console.error("Error deleting files from Supabase:", error);
+            }
+        }
+
         await pool.query(`DELETE FROM publications WHERE id = ?`, [id]);
         return NextResponse.json({ message: 'Deleted successfully' });
     } catch (err) {
@@ -51,6 +81,35 @@ export async function PUT(request, { params }) {
         if (!id) return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
         const data = await request.json();
+
+        // 1. Get current files to find any deleted images
+        const [rows] = await pool.query(`SELECT images, plan_url FROM publications WHERE id = ?`, [id]);
+        if (rows.length > 0) {
+            const oldProp = rows[0];
+            let oldUrls = [];
+            try {
+                if (oldProp.images) {
+                    const parsed = typeof oldProp.images === 'string' ? JSON.parse(oldProp.images) : oldProp.images;
+                    if (Array.isArray(parsed)) oldUrls.push(...parsed);
+                }
+            } catch(e) {}
+            if (oldProp.plan_url) oldUrls.push(oldProp.plan_url);
+
+            // 2. Get incoming files
+            const incomingImages = data.images && Array.isArray(data.images) ? data.images : (data.image_url ? [data.image_url] : []);
+            let newUrls = [...incomingImages];
+            if (data.plan_url) newUrls.push(data.plan_url);
+
+            // 3. Find missing URLs
+            const missingUrls = oldUrls.filter(url => !newUrls.includes(url));
+            const filesToDelete = extractFilenamesFromUrls(missingUrls);
+
+            // 4. Delete missing files from bucket
+            if (filesToDelete.length > 0) {
+                const { error } = await supabaseAdmin.storage.from('propiedades').remove(filesToDelete);
+                if (error) console.error("Error deleting orphaned files from Supabase:", error);
+            }
+        }
 
         // Handle images array, fallback to empty array
         const imagesList = data.images && Array.isArray(data.images) ? data.images : (data.image_url ? [data.image_url] : []);

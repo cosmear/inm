@@ -299,7 +299,7 @@ const SearchContent = () => {
                                             name="provincia"
                                             value={filters.provincia}
                                             onChange={handleFilterChange}
-                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium text-sm appearance-none cursor-pointer"
+                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium appearance-none cursor-pointer"
                                         >
                                             <option value="" className="text-stone-dark/50">Provincia (Todas)</option>
                                             {provinces.map(p => <option key={p} value={p}>{p}</option>)}
@@ -313,7 +313,7 @@ const SearchContent = () => {
                                             value={filters.ciudad}
                                             onChange={handleFilterChange}
                                             placeholder="Ciudad o Barrio..."
-                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium text-sm"
+                                            className="w-full bg-stone-50 border border-stone-dark/5 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:bg-stone-50 transition-colors font-medium"
                                         />
                                     </div>
                                 </div>

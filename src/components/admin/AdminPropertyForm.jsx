@@ -165,7 +165,7 @@ export default function AdminPropertyForm({
 
                                     <div>
                                         <label className="text-xs font-medium text-stone-dark/60 block mb-3">Tipo de operación</label>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-[1px] bg-stone-dark/20 border border-stone-dark/20 rounded-xl overflow-hidden w-full md:w-fit">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-stone-dark/20 border border-stone-dark/20 rounded-xl overflow-hidden w-full md:w-fit">
                                             {['Venta', 'Alquiler', 'Temporada', 'Proyecto'].map(op => (
                                                 <button
                                                     key={op}

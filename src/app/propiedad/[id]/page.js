@@ -206,7 +206,7 @@ export default async function PropertyDetails({ params }) {
                                 Descripción
                             </h3>
                             <div className="bg-white border border-stone-dark/5 rounded-2xl p-6 md:p-8 shadow-sm">
-                                <div className="prose prose-stone max-w-none prose-p:leading-relaxed prose-p:text-stone-dark/80 whitespace-pre-wrap break-words">
+                                <div className="prose prose-stone max-w-none prose-p:leading-relaxed prose-p:text-stone-dark/80 whitespace-pre-wrap wrap-break-word">
                                     {description}
                                 </div>
                             </div>
