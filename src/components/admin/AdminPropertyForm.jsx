@@ -338,28 +338,32 @@ export default function AdminPropertyForm({
                                                             <img src={img instanceof File ? URL.createObjectURL(img) : img} alt={`Img ${idx + 1}`} className="w-full h-full object-cover" />
 
                                                             {/* Controls Overlay */}
-                                                            <div className="absolute inset-0 bg-transparent group-hover:bg-black/20 transition-colors pointer-events-none"></div>
+                                                            <div className="absolute inset-0 bg-transparent group-hover:bg-black/30 transition-colors pointer-events-none"></div>
 
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeImage(idx)}
-                                                                className="absolute top-1.5 right-1.5 bg-white/90 hover:bg-red-500 hover:text-white text-stone-dark rounded-full size-6 flex items-center justify-center shadow-md transition-all opacity-90 md:opacity-0 md:group-hover:opacity-100 z-10"
-                                                                title="Eliminar imagen"
-                                                            >
-                                                                <span className="material-symbols-outlined text-[14px]">close</span>
-                                                            </button>
+                                                            <div className="absolute inset-0 flex flex-col justify-between p-1.5 opacity-90 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10">
+                                                                <div className="flex justify-end">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeImage(idx)}
+                                                                        className="bg-white/90 hover:bg-red-500 hover:text-white text-stone-dark rounded-sm size-6 flex items-center justify-center shadow-sm backdrop-blur-md transition-colors"
+                                                                        title="Eliminar imagen"
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-[16px]">close</span>
+                                                                    </button>
+                                                                </div>
 
-                                                            <div className="absolute bottom-1.5 inset-x-0 flex justify-center gap-2 opacity-90 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 px-1">
-                                                                {idx > 0 && (
-                                                                    <button type="button" onClick={() => moveImage(idx, -1)} className="bg-white/90 hover:bg-white text-stone-dark size-7 rounded-md flex items-center justify-center shadow-md transition-colors" title="Mover a la izquierda">
-                                                                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
-                                                                    </button>
-                                                                )}
-                                                                {idx < form.images.length - 1 && (
-                                                                    <button type="button" onClick={() => moveImage(idx, 1)} className="bg-white/90 hover:bg-white text-stone-dark size-7 rounded-md flex items-center justify-center shadow-md transition-colors" title="Mover a la derecha">
-                                                                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-                                                                    </button>
-                                                                )}
+                                                                <div className="flex justify-between w-full">
+                                                                    {idx > 0 ? (
+                                                                        <button type="button" onClick={() => moveImage(idx, -1)} className="bg-white/90 hover:bg-white text-stone-dark size-6 rounded-sm flex items-center justify-center shadow-sm backdrop-blur-md transition-colors" title="Mover a la izquierda">
+                                                                            <span className="material-symbols-outlined text-[18px] leading-none">chevron_left</span>
+                                                                        </button>
+                                                                    ) : <div></div>}
+                                                                    {idx < form.images.length - 1 ? (
+                                                                        <button type="button" onClick={() => moveImage(idx, 1)} className="bg-white/90 hover:bg-white text-stone-dark size-6 rounded-sm flex items-center justify-center shadow-sm backdrop-blur-md transition-colors" title="Mover a la derecha">
+                                                                            <span className="material-symbols-outlined text-[18px] leading-none">chevron_right</span>
+                                                                        </button>
+                                                                    ) : <div></div>}
+                                                                </div>
                                                             </div>
 
                                                             {idx === 0 && (
