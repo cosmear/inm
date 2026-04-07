@@ -14,6 +14,7 @@ const SearchContent = () => {
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [pagination, setPagination] = useState({ page: 1, limit: 12, total: 0, totalPages: 0 });
     const [activeOperations, setActiveOperations] = useState([]);
+    const [isScrollingDown, setIsScrollingDown] = useState(false);
 
     // Local state for all filters
     const [filters, setFilters] = useState({
@@ -118,6 +119,40 @@ const SearchContent = () => {
         return () => controller.abort();
     }, [operation, type, subtipo, provincia, ciudad, location, minPrice, maxPrice, bedrooms, ambientes, amenitiesStr]);
 
+    useEffect(() => {
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+
+        const updateScrollDir = () => {
+            const scrollY = window.scrollY;
+            
+            if (Math.abs(scrollY - lastScrollY) < 15) {
+                ticking = false;
+                return;
+            }
+            if (showAdvanced) { 
+                setIsScrollingDown(false);
+                lastScrollY = scrollY > 0 ? scrollY : 0;
+                ticking = false;
+                return;
+            }
+            
+            setIsScrollingDown(scrollY > lastScrollY && scrollY > 100);
+            lastScrollY = scrollY > 0 ? scrollY : 0;
+            ticking = false;
+        };
+
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScrollDir);
+                ticking = true;
+            }
+        };
+
+        window.addEventListener("scroll", onScroll);
+        return () => window.removeEventListener("scroll", onScroll);
+    }, [isScrollingDown, showAdvanced]);
+
     const handleFilterChange = (e) => setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     const handleOperationChange = (op) => setFilters(prev => ({ ...prev, operation: op }));
 
@@ -179,7 +214,7 @@ const SearchContent = () => {
         <div className="bg-cream min-h-screen pt-24 font-display flex flex-col">
 
             {/* Sticky Horizontal Filter Bar */}
-            <div className="sticky top-[72px] md:top-[88px] z-30 bg-white/80 backdrop-blur-md border-b border-stone-dark/10 shadow-sm py-4 mb-8">
+            <div className={`sticky top-20 z-30 bg-white/80 backdrop-blur-md border-b border-stone-dark/10 shadow-sm py-4 mb-8 transition-transform duration-300 md:translate-y-0 ${isScrollingDown ? '-translate-y-full opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto' : 'translate-y-0 opacity-100'}`}>
                 <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
                     <div className="flex flex-col md:flex-row items-center gap-4">
 
@@ -254,7 +289,7 @@ const SearchContent = () => {
                     {/* Advanced Filters Panel (Collapsible) */}
                     <div className={`grid transition-all duration-500 ease-in-out ${showAdvanced ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'}`}>
                         <div className="overflow-hidden">
-                            <div className="bg-white rounded-2xl p-6 border border-stone-dark/5 shadow-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="bg-white rounded-2xl p-6 md:p-6 border border-stone-dark/5 shadow-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-h-[60vh] md:max-h-none overflow-y-auto w-full scrollbar-thin">
 
                                 {/* Quick Search Inputs (Mobile Only inside Advanced Panel) */}
                                 <div className="md:hidden space-y-6 col-span-1">

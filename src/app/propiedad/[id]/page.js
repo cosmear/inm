@@ -111,16 +111,16 @@ export default async function PropertyDetails({ params }) {
                                 {prop.status === 'reserved' && <span className="bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Reservada</span>}
                                 {prop.status === 'sold' && <span className="bg-red-100 text-red-700 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md">Vendida</span>}
                             </div>
-                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-stone-dark mb-2 leading-tight">{title}</h1>
-                            <div className="flex items-center gap-2 text-stone-dark/70 font-medium">
+                            <h1 className="font-serif text-3xl md:text-5xl lg:text-6xl text-stone-dark mb-2 leading-tight">{title}</h1>
+                            <div className="flex items-center gap-2 text-stone-dark/70 text-sm md:text-base font-medium">
                                 <span className="material-symbols-outlined text-lg">location_on</span>
                                 {displayLocation}
                             </div>
                         </div>
                         <div className="text-left md:text-right flex flex-col items-start md:items-end">
-                            <div className="flex items-center gap-4 mb-2">
+                            <div className="flex items-center gap-3 mb-2">
                                 <FavoriteButton propertyId={id} />
-                                <p className="font-serif text-4xl md:text-5xl text-primary font-medium tracking-tight whitespace-nowrap">
+                                <p className="font-serif text-[28px] leading-none md:text-5xl text-primary font-medium tracking-tight whitespace-nowrap">
                                     USD {price?.toLocaleString()}
                                 </p>
                             </div>
